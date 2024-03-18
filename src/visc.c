@@ -1,5 +1,16 @@
 #include "visc.h"
 
+// Registers
+#define A 0
+#define B 1
+#define C 2
+#define D 3
+#define E 4
+#define F 5
+#define G 6
+#define H 7
+
+// Instructions
 #define ADD 0
 #define SUB 1
 #define SL 3
@@ -10,10 +21,11 @@
 
 struct Instruction
 {
-    uint8_t opcode;
-    uint8_t reg1;
-    uint8_t reg2;
-    uint32_t reserved;
+    uint8_t opcode : 8;
+    uint8_t reg1 : 4;
+    uint8_t reg2 : 4;
+    uint16_t reserved;
+    uint32_t argument;
 };
 
 VISC_I *init_visc(uint32_t *memory)
@@ -52,20 +64,21 @@ void run_visc(VISC_I *visc)
         curInst.opcode = (val >> 24) & 0xFF;
         curInst.reg1 = (val >> 20) & 0x0F;
         curInst.reg2 = (val >> 16) & 0x0F;
-        curInst.reserved = val & 0xFFFFFFFF;
+        curInst.reserved = (val >> 8) & 0xFFFF;
+        curInst.argument = read(visc->memory, addr + 1);
 
         switch (curInst.opcode)
         {
         case ADD:
-            int oreg = curInst.reg1;
-            int ireg = curInst.reg2;
-
-                        break;
+            visc->registers[curInst.reg1] = visc->registers[curInst.reg2];
+            printf("[VISC Debug] Preformed ADD operation at 0x%04X\n", visc->PC);
+            break;
         default:
-            printf("[VISC] Unknown opcode \"%d\". Halting the CPU.\n", curInst.opcode);
+            printf("[VISC] Unknown opcode \"%d\" (At 0x%04X). Halting the CPU.\n", curInst.opcode, visc->PC);
             shouldRun = false;
             break;
         }
+
         visc->PC += 2;
     }
 }

@@ -13,14 +13,7 @@
 typedef struct
 {
     // Registers
-    uint32_t A;
-    uint32_t B;
-    uint32_t C;
-    uint32_t D;
-    uint32_t E;
-    uint32_t F;
-    uint32_t G;
-    uint32_t H;
+    uint32_t registers[7];
 
     uint16_t PC;
     uint32_t *memory;
