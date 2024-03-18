@@ -96,13 +96,10 @@ void run_visc(VISC_I *visc)
 
         uint32_t val = read(visc->memory, addr);
         struct Instruction curInst;
-
-        curInst.opcode = (val >> 8) & 0xFF;
-        curInst.reg1 = (val >> 16) & 0x0F;
-        curInst.reg2 = (val >> 20) & 0x0F;
-        curInst.reserved = (val >> 24) & 0xFFFF;
-        curInst.argument = read(visc->memory, addr + 1);
-
+        curInst.opcode = val & 0xFF;
+        curInst.reg1 = (val >> 8) & 0x0F;
+        curInst.reg2 = (val >> 12) & 0x0F;
+        curInst.reserved = (val >> 16) & 0xFFFF;
         const char* reg1_label = get_register_label(curInst.reg1);
         const char* reg2_label = get_register_label(curInst.reg2);
 
