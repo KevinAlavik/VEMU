@@ -3,13 +3,10 @@
 
 int main() {
     uint32_t *mem = init_memory();
-    mem[0] = 0x08000001;
-    mem[1] = 0x00000001;
-    mem[2] = 0x08010001;
-    mem[3] = 0x00000001;
-    mem[4] = 0x00100100;
-    mem[5] = 0x90000000;
     VISC_I *cpu = init_visc(mem);
+    mem[0] = (8 & 0xFF) | ((0 & 0x0F) << 8) | ((0 & 0x0F) << 12);
+    mem[1] = 0x0000001;
+    mem[2] = 0x00000009;
     run_visc(cpu);
     printf("A: %d\n", cpu->registers[0]);
     printf("B: %d\n", cpu->registers[1]);

@@ -100,49 +100,52 @@ void run_visc(VISC_I *visc)
         curInst.reg1 = (val >> 8) & 0x0F;
         curInst.reg2 = (val >> 12) & 0x0F;
         curInst.reserved = (val >> 16) & 0xFFFF;
+        curInst.argument = read(visc->memory, addr+1);
         const char* reg1_label = get_register_label(curInst.reg1);
         const char* reg2_label = get_register_label(curInst.reg2);
+
+        printf("[0x%08X]\n", addr);
 
         switch (curInst.opcode)
         {
             case ADD:
                 visc->registers[curInst.reg1] += visc->registers[curInst.reg2];
-                printf("[VISC Debug] Performed ADD operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                printf("[VISC Debug] Performed ADD operation at 0x%08X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
                 break;
             case SUB:
                 visc->registers[curInst.reg1] -= visc->registers[curInst.reg2];
-                printf("[VISC Debug] Performed SUB operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                printf("[VISC Debug] Performed SUB operation at 0x%08X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
                 break;
             case SL:
                 visc->registers[curInst.reg1] <<= visc->registers[curInst.reg2];
-                printf("[VISC Debug] Performed SL operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                printf("[VISC Debug] Performed SL operation at 0x%08X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
                 break;
             case SR:
                 visc->registers[curInst.reg1] >>= visc->registers[curInst.reg2];
-                printf("[VISC Debug] Performed SR operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                printf("[VISC Debug] Performed SR operation at 0x%08X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
                 break;
             case AND:
                 visc->registers[curInst.reg1] &= visc->registers[curInst.reg2];
-                printf("[VISC Debug] Performed AND operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                printf("[VISC Debug] Performed AND operation at 0x%08X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
                 break;
             case OR:
                 visc->registers[curInst.reg1] |= visc->registers[curInst.reg2];
-                printf("[VISC Debug] Performed OR operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                printf("[VISC Debug] Performed OR operation at 0x%08X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
                 break;
             case XOR:
                 visc->registers[curInst.reg1] ^= visc->registers[curInst.reg2];
-                printf("[VISC Debug] Performed XOR operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                printf("[VISC Debug] Performed XOR operation at 0x%08X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
                 break;
             case LDI:
                 visc->registers[curInst.reg1] = curInst.argument;
-                printf("[VISC Debug] Performed LDI operation at 0x%04X (Loaded 0x%08X into %s)\n", visc->PC, curInst.argument, reg1_label);
+                printf("[VISC Debug] Performed LDI operation at 0x%08X (Loaded 0x%08X into %s)\n", visc->PC, curInst.argument, reg1_label);
                 break;
             case HLT:
-                printf("[VISC Debug] Preformed HLT operation at 0x%04X\n", addr);
+                printf("[VISC Debug] Preformed HLT operation at 0x%08X\n", addr);
                 shouldRun = false;
                 break;
             default:
-                printf("[VISC] Unknown opcode \"%d\" (At 0x%04X). Halting the CPU.\n", curInst.opcode, visc->PC);
+                printf("[VISC] Unknown opcode \"%d\" (At 0x%08X). Halting the CPU.\n", curInst.opcode, visc->PC);
                 shouldRun = false;
                 break;
         }
