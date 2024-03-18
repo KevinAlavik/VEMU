@@ -110,7 +110,7 @@ void run_visc(VISC_I *visc)
         {
             case ADD:
                 visc->registers[curInst.reg1] += visc->registers[curInst.reg2];
-                printf("[VISC Debug] Performed ADD operation at 0x%08X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                printf("[VISC Debug] Performed ADD operation at 0x%08X (%s + %s -> %s)\n", visc->PC, reg1_label, reg2_label, reg1_label);
                 break;
             case SUB:
                 visc->registers[curInst.reg1] -= visc->registers[curInst.reg2];
