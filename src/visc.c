@@ -58,6 +58,13 @@ void run_visc(VISC_I *visc)
     while (shouldRun)
     {
         int addr = visc->PC;
+        if (addr >= MEMORY_SIZE)
+        {
+            printf("[VISC] Program counter exceeded memory size. Halting the CPU.\n");
+            shouldRun = false;
+            break;
+        }
+
         uint32_t val = read(visc->memory, addr);
         struct Instruction curInst;
 
@@ -71,7 +78,7 @@ void run_visc(VISC_I *visc)
         {
         case ADD:
             visc->registers[curInst.reg1] = visc->registers[curInst.reg2];
-            printf("[VISC Debug] Preformed ADD operation at 0x%04X\n", visc->PC);
+            printf("[VISC Debug] Performed ADD operation at 0x%04X\n", visc->PC);
             break;
         default:
             printf("[VISC] Unknown opcode \"%d\" (At 0x%04X). Halting the CPU.\n", curInst.opcode, visc->PC);
