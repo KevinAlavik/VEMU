@@ -13,7 +13,7 @@
 typedef struct
 {
     // Registers
-    uint32_t registers[7];
+    uint32_t registers[8];
 
     uint16_t PC;
     uint32_t *memory;

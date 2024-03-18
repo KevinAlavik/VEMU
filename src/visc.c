@@ -18,6 +18,8 @@
 #define AND 5
 #define OR 6
 #define XOR 7
+#define LDI 8
+#define HLT 9
 
 struct Instruction
 {
@@ -48,7 +50,34 @@ VISC_I *init_visc(uint32_t *memory)
         return NULL;
     }
 
+    cpu->PC = 0x00000000; // Make sure to start at addres 0x00000000
+
     return cpu;
+}
+
+const char* get_register_label(int reg_num)
+{
+    switch (reg_num)
+    {
+        case A:
+            return "A";
+        case B:
+            return "B";
+        case C:
+            return "C";
+        case D:
+            return "D";
+        case E:
+            return "E";
+        case F:
+            return "F";
+        case G:
+            return "G";
+        case H:
+            return "H";
+        default:
+            return "Invalid Register Number";
+    }
 }
 
 void run_visc(VISC_I *visc)
@@ -62,7 +91,7 @@ void run_visc(VISC_I *visc)
         {
             printf("[VISC] Program counter exceeded memory size. Halting the CPU.\n");
             shouldRun = false;
-            break;
+            return;
         }
 
         uint32_t val = read(visc->memory, addr);
@@ -74,16 +103,51 @@ void run_visc(VISC_I *visc)
         curInst.reserved = (val >> 24) & 0xFFFF;
         curInst.argument = read(visc->memory, addr + 1);
 
+        const char* reg1_label = get_register_label(curInst.reg1);
+        const char* reg2_label = get_register_label(curInst.reg2);
+
         switch (curInst.opcode)
         {
-        case ADD:
-            visc->registers[curInst.reg1] += visc->registers[curInst.reg2];
-            printf("[VISC Debug] Performed ADD operation at 0x%04X\n", visc->PC);
-            break;
-        default:
-            printf("[VISC] Unknown opcode \"%d\" (At 0x%04X). Halting the CPU.\n", curInst.opcode, visc->PC);
-            shouldRun = false;
-            break;
+            case ADD:
+                visc->registers[curInst.reg1] += visc->registers[curInst.reg2];
+                printf("[VISC Debug] Performed ADD operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                break;
+            case SUB:
+                visc->registers[curInst.reg1] -= visc->registers[curInst.reg2];
+                printf("[VISC Debug] Performed SUB operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                break;
+            case SL:
+                visc->registers[curInst.reg1] <<= visc->registers[curInst.reg2];
+                printf("[VISC Debug] Performed SL operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                break;
+            case SR:
+                visc->registers[curInst.reg1] >>= visc->registers[curInst.reg2];
+                printf("[VISC Debug] Performed SR operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                break;
+            case AND:
+                visc->registers[curInst.reg1] &= visc->registers[curInst.reg2];
+                printf("[VISC Debug] Performed AND operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                break;
+            case OR:
+                visc->registers[curInst.reg1] |= visc->registers[curInst.reg2];
+                printf("[VISC Debug] Performed OR operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                break;
+            case XOR:
+                visc->registers[curInst.reg1] ^= visc->registers[curInst.reg2];
+                printf("[VISC Debug] Performed XOR operation at 0x%04X (%s -> %s)\n", visc->PC, reg2_label, reg1_label);
+                break;
+            case LDI:
+                visc->registers[curInst.reg1] = curInst.argument;
+                printf("[VISC Debug] Performed LDI operation at 0x%04X (Loaded 0x%08X into %s)\n", visc->PC, curInst.argument, reg1_label);
+                break;
+            case HLT:
+                printf("[VISC Debug] Preformed HLT operation at 0x%04X\n", addr);
+                shouldRun = false;
+                break;
+            default:
+                printf("[VISC] Unknown opcode \"%d\" (At 0x%04X). Halting the CPU.\n", curInst.opcode, visc->PC);
+                shouldRun = false;
+                break;
         }
 
         visc->PC += 2;
