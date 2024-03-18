@@ -13,13 +13,13 @@
 // Instructions
 #define ADD 0
 #define SUB 1
-#define SL 3
-#define SR 4
-#define AND 5
-#define OR 6
-#define XOR 7
-#define LDI 8
-#define HLT 9
+#define SL 2
+#define SR 3
+#define AND 4
+#define OR 5
+#define XOR 6
+#define LDI 7
+#define HLT 8
 
 struct Instruction
 {
