@@ -77,7 +77,7 @@ void run_visc(VISC_I *visc)
         switch (curInst.opcode)
         {
         case ADD:
-            visc->registers[curInst.reg1] = visc->registers[curInst.reg2];
+            visc->registers[curInst.reg1] += visc->registers[curInst.reg2];
             printf("[VISC Debug] Performed ADD operation at 0x%04X\n", visc->PC);
             break;
         default:
