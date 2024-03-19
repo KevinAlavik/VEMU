@@ -30,7 +30,7 @@ struct Instruction
     uint32_t argument;
 };
 
-VISC_I *init_visc(uint32_t *memory)
+VISC_I *init_visc()
 {
     VISC_I *cpu = malloc(sizeof(VISC_I));
     if (cpu == NULL)
@@ -39,18 +39,7 @@ VISC_I *init_visc(uint32_t *memory)
         return NULL;
     }
 
-    if (memory != NULL)
-    {
-        cpu->memory = memory;
-    }
-    else
-    {
-        printf("[VISC] A NULL memory pointer got passed at %s\n", __FILE__);
-        free(cpu);
-        return NULL;
-    }
-
-    cpu->PC = 0x00000000; // Make sure to start at addres 0x00000000
+    cpu->PC = 0x00000000; // Start of ROM
 
     return cpu;
 }
@@ -94,13 +83,13 @@ void run_visc(VISC_I *visc)
             return;
         }
 
-        uint32_t val = read(visc->memory, addr);
+        uint32_t val = bus_read(addr);
         struct Instruction curInst;
         curInst.opcode = val & 0xFF;
         curInst.reg1 = (val >> 8) & 0x0F;
         curInst.reg2 = (val >> 12) & 0x0F;
         curInst.reserved = (val >> 16) & 0xFFFF;
-        curInst.argument = read(visc->memory, addr+1);
+        curInst.argument = bus_read(addr + 1);
         const char* reg1_label = get_register_label(curInst.reg1);
         const char* reg2_label = get_register_label(curInst.reg2);
 
