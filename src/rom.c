@@ -1,4 +1,4 @@
-#include "rom.h
+#include "rom.h"
 char *rom;
 uint16_t rom_base;
 
