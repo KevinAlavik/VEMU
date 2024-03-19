@@ -56,14 +56,12 @@ VISC_I *init_visc()
 Instruction extract_instruction(uint32_t val_low, uint32_t val_high) {
     Instruction instr;
     
-    instr.class = (val_low >> 28) & 0xF;
-    instr.opcode = (val_low >> 24) & 0xFF;
-    instr.sr1 = (val_low >> 20) & 0xF;
+    instr.class = val_low & 0xF;
+    instr.opcode = (val_low >> 4) & 0xFF;
+    instr.sr1 = (val_low >> 12) & 0xF;
     instr.sr2 = (val_low >> 16) & 0xF;
-    instr.dr = (val_low >> 12) & 0xF;
-    instr.data = ((uint64_t)val_low & 0xFFF) << 32;
-
-    instr.data |= (uint64_t)(val_high & 0xFFFFFFFF);
+    instr.dr = (val_low >> 20) & 0xF;
+    instr.data = ((uint64_t)(val_high & 0xFFFF) << 32) | (val_low >> 24);
 
     return instr;
 }
