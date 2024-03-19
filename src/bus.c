@@ -1,14 +1,16 @@
 #include "bus.h"
 #include <stdio.h>
 
-#define MAX_DEVICES 10
+#define MAX_DEVICES 8
 
 static struct device devices[MAX_DEVICES];
 static int num_devices = 0;
 
-bool add_device(uint16_t base, uint16_t limit, BusReadFunc read,
-                BusWriteFunc write) {
-    if (num_devices >= MAX_DEVICES) {
+bool add_device(uint32_t base, uint32_t limit, BusReadFunc read,
+                BusWriteFunc write)
+{
+    if (num_devices >= MAX_DEVICES)
+    {
         printf("[VISC Debug] Maximum number of devices reached\n");
         return false;
     }
@@ -21,9 +23,12 @@ bool add_device(uint16_t base, uint16_t limit, BusReadFunc read,
     return true;
 }
 
-void bus_write(uint16_t addr, uint32_t data) {
-    for (int i = 0; i < num_devices; i++) {
-        if (addr >= devices[i].base && addr <= devices[i].limit && devices[i].write) {
+void bus_write(uint32_t addr, uint32_t data)
+{
+    for (int i = 0; i < num_devices; i++)
+    {
+        if (addr >= devices[i].base && addr <= devices[i].limit && devices[i].write)
+        {
             devices[i].write(addr, data);
             return;
         }
@@ -31,12 +36,15 @@ void bus_write(uint16_t addr, uint32_t data) {
     printf("[VISC Debug] Write address %u out of range or no write function provided\n", addr);
 }
 
-uint32_t bus_read(uint16_t addr) {
-    for (int i = 0; i < num_devices; i++) {
-        if (addr >= devices[i].base && addr <= devices[i].limit && devices[i].read) {
+uint32_t bus_read(uint32_t addr)
+{
+    for (int i = 0; i < num_devices; i++)
+    {
+        if (addr >= devices[i].base && addr <= devices[i].limit && devices[i].read)
+        {
             return devices[i].read(addr);
         }
     }
     printf("[VISC Debug] Read address %u out of range or no read function provided\n", addr);
-    return -1; 
+    return -1;
 }

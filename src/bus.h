@@ -4,18 +4,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef uint32_t (*BusReadFunc)(uint16_t);
-typedef void (*BusWriteFunc)(uint16_t, uint32_t);
+typedef uint32_t (*BusReadFunc)(uint32_t);
+typedef void (*BusWriteFunc)(uint32_t, uint32_t);
 
-struct device {
-    uint16_t base;
-    uint16_t limit;
+struct device
+{
+    uint32_t base;
+    uint32_t limit;
     BusReadFunc read;
     BusWriteFunc write;
 };
-bool add_device(uint16_t base, uint16_t limit, BusReadFunc read,
-                BusWriteFunc write);
-void bus_write(uint16_t addr, uint32_t data);
-uint32_t bus_read(uint16_t addr);
 
-#endif // __BUSS_H__
+bool add_device(uint32_t base, uint32_t limit, BusReadFunc read,
+                BusWriteFunc write);
+void bus_write(uint32_t addr, uint32_t data);
+uint32_t bus_read(uint32_t addr);
+
+#endif // __BUS_H__
