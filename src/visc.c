@@ -53,6 +53,12 @@ VISC_I *init_visc()
     return cpu;
 }
 
+Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
+{
+    Instruction instr = {0}; // Fill it all with 0s becuz im a bitch
+    return instr;
+}
+
 void run_visc(VISC_I *visc)
 {
     bool shouldRun = true;
@@ -64,16 +70,61 @@ void run_visc(VISC_I *visc)
         addr = visc->curPlane[PC];
         switch_plane(visc, 0);
 
-        if (addr > 0x0000FFFF)
+        if ((addr + 1) >= 0x0000FFFF)
         {
             shouldRun = false;
             return;
         }
 
-        uint32_t val = bus_read(addr);
-        (void)val;
+        uint32_t val_low = bus_read(addr);
+        uint32_t val_high = bus_read(addr + 1);
+        printf("L: %d, H: %d\n", val_low, val_high);
 
-        // printf("[PC: 0x%08X: 0x%08X]\n", addr, val);
+        Instruction instr = extract_instruction(val_low, val_high);
+        bool d, a, j, al, f = false;
+
+        switch (instr.class)
+        {
+        case DATA_CLASS:
+            d = true;
+            break;
+        case ALU_CLASS:
+            a = true;
+            break;
+        case JUMP_CLASS:
+            j = true;
+            break;
+        case ALGORITHM_CLASS:
+            al = true;
+            break;
+        case FLOAT_CLASS:
+            f = true;
+            break;
+        default:
+            printf("[VISC] Unknown opcode class \"%d\"\n", instr.class);
+            break;
+        }
+
+        if (d)
+        {
+            printf("[VISC] The opcode class labeld \"DATA_CLASS\" is unimpelemented!\n");
+        }
+        else if (a)
+        {
+            printf("[VISC] The opcode class labeld \"ALU_CLASS\" is unimpelemented!\n");
+        }
+        else if (j)
+        {
+            printf("[VISC] The opcode class labeld \"JUMP_CLASS\" is unimpelemented!\n");
+        }
+        else if (al)
+        {
+            printf("[VISC] The opcode class labeld \"ALGORITHM_CLASS\" is unimpelemented!\n");
+        }
+        else if (f)
+        {
+            printf("[VISC] The opcode class labeld \"FLOAT_CLASS\" is unimpelemented!\n");
+        }
 
         switch_plane(visc, 1);
         visc->curPlane[PC] += 2;
