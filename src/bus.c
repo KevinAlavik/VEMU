@@ -21,7 +21,7 @@ bool add_device(uint16_t base, uint16_t limit, BusReadFunc read,
     return true;
 }
 
-void bus_write(uint16_t addr, uint8_t data) {
+void bus_write(uint16_t addr, uint32_t data) {
     for (int i = 0; i < num_devices; i++) {
         if (addr >= devices[i].base && addr <= devices[i].limit && devices[i].write) {
             devices[i].write(addr, data);
@@ -31,7 +31,7 @@ void bus_write(uint16_t addr, uint8_t data) {
     printf("[VISC Debug] Write address %u out of range or no write function provided\n", addr);
 }
 
-uint8_t bus_read(uint16_t addr) {
+uint32_t bus_read(uint16_t addr) {
     for (int i = 0; i < num_devices; i++) {
         if (addr >= devices[i].base && addr <= devices[i].limit && devices[i].read) {
             return devices[i].read(addr);
