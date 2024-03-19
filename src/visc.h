@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "buss.h"
+#include "bus.h"
 
 typedef struct
 {
