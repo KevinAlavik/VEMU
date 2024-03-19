@@ -45,11 +45,11 @@ VISC_I *init_visc()
 
     cpu->planeNum = 0;
 
-    // Make a better system to write to the second plane
-    switch_plane(cpu, 1);
-    cpu->curPlane[PC] = 0x00000000;
-    switch_plane(cpu, 0);
-
+    for(int i = 0; i > PLANE_SIZE; i++) {
+        cpu->curPlane[i] = 0x00000000;
+    }
+    
+    cpu->high_plane[PC] = 0x00000000;
     return cpu;
 }
 
