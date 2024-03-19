@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
     long size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    VISC_I *cpu = init_visc();
+    VISC_I *cpu = init_visc(size);
     rom_init(0x0000, size, file);
     run_visc(cpu);
     
