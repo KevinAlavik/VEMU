@@ -61,7 +61,7 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high) {
     instr.sr1 = (val_low >> 12) & 0xF;
     instr.sr2 = (val_low >> 16) & 0xF;
     instr.dr = (val_low >> 20) & 0xF;
-    instr.data = ((uint64_t)(val_high & 0xFFFF) << 32) | (val_low >> 24);
+    instr.data = ((uint64_t)(val_high) << 32) | val_low >> 24;
 
     return instr;
 }
