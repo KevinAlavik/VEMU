@@ -23,7 +23,9 @@ int main() {
         return 1;
     }
 
-    fwrite(rom, sizeof(unsigned int), ROM_SIZE, file);
+    for (int i = 0; i < ROM_SIZE; i++) {
+        fwrite(&rom[i], sizeof(unsigned int), 1, file);
+    }
     fseek(file, 0, SEEK_SET);
 
     fseek(file, 0, SEEK_END);
@@ -31,7 +33,7 @@ int main() {
     fseek(file, 0, SEEK_SET);
 
     VISC_I *cpu = init_visc(size); 
-    rom_init(0x0000000, size, file);
+    rom_init(0x0000, size, file);
     run_visc(cpu);
     
     printf("A: %d\n", cpu->registers[0]);
