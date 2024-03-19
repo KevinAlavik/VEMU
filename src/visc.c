@@ -30,7 +30,7 @@ struct Instruction
     uint32_t argument;
 };
 
-VISC_I *init_visc()
+VISC_I *init_visc(int rom_size)
 {
     VISC_I *cpu = malloc(sizeof(VISC_I));
     if (cpu == NULL)
@@ -40,6 +40,7 @@ VISC_I *init_visc()
     }
 
     cpu->PC = 0x00000000; // Start of ROM
+    cpu->rom_size = rom_size; 
 
     return cpu;
 }
