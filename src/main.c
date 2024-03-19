@@ -1,13 +1,29 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "visc.h"
 #include "bus.h"
 #include "rom.h"
 
-int main() {
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+    
+    FILE *file = fopen(argv[1], "rb");
+    if (file == NULL) {
+        perror("[VEMU] Error opening ROM file");
+        return 1;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
     VISC_I *cpu = init_visc();
-    rom_init(0x0000000, 0xFFFFFFFF, NULL); // TODO: Make it read a file lol
+    rom_init(0x0000000, size, file);
     run_visc(cpu);
     
-    // Register Dump
     printf("A: %d\n", cpu->registers[0]);
     printf("B: %d\n", cpu->registers[1]);
     printf("C: %d\n", cpu->registers[2]);
@@ -17,5 +33,8 @@ int main() {
     printf("G: %d\n", cpu->registers[6]);
     printf("H: %d\n", cpu->registers[7]);
     printf("PC: %d\n", cpu->PC);
+    
+    fclose(file);
+    
     return 0;
 }
