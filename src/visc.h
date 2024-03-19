@@ -8,18 +8,15 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include "memory.h"
+#include "buss.h"
 
 typedef struct
 {
-    // Registers
     uint32_t registers[8];
-
     uint16_t PC;
-    uint32_t *memory;
 } VISC_I;
 
-VISC_I *init_visc(uint32_t *memory);
+VISC_I *init_visc();
 void run_visc(VISC_I *visc);
 
 #endif // __VISC_H__
