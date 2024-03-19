@@ -1,20 +1,13 @@
 #include "visc.h"
-#include "memory.h"
+#include "bus.h"
+#include "rom.h"
 
 int main() {
-    uint32_t *mem = init_memory();
-    VISC_I *cpu = init_visc(mem);
-
-    // Simple 1+1 into B
-    mem[0] = (7 & 0xFF) | ((0 & 0x0F) << 8) | ((0 & 0x0F) << 12);
-    mem[1] = 0x0000001;
-    mem[2] = (7 & 0xFF) | ((1 & 0x0F) << 8) | ((0 & 0x0F) << 12);
-    mem[3] = 0x0000001;
-    mem[4] = (0 & 0xFF) | ((1 & 0x0F) << 8) | ((0 & 0x0F) << 12);
-    mem[5] = 0x00000000;
-    mem[6] = 0x00000008;
-
+    VISC_I *cpu = init_visc();
+    rom_init(0x0000000, 0xFFFFFFFF, NULL); // TODO: Make it read a file lol
     run_visc(cpu);
+    
+    // Register Dump
     printf("A: %d\n", cpu->registers[0]);
     printf("B: %d\n", cpu->registers[1]);
     printf("C: %d\n", cpu->registers[2]);
@@ -23,5 +16,6 @@ int main() {
     printf("F: %d\n", cpu->registers[5]);
     printf("G: %d\n", cpu->registers[6]);
     printf("H: %d\n", cpu->registers[7]);
+    printf("PC: %d\n", cpu->PC);
     return 0;
 }
