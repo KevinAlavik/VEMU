@@ -9,6 +9,7 @@
 #include <stdbool.h>
 
 #include "bus.h"
+#include "rom.h"
 
 typedef struct
 {
