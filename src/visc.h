@@ -44,7 +44,7 @@
 #define SP 9
 #define BP 10
 #define RESERVED_1 11
-#define RESERVER_2 12
+#define RESERVED_2 12
 #define STATUS 13
 #define HARTID 14
 #define FLAGS 15
