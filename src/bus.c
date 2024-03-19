@@ -16,7 +16,7 @@ bool add_device(uint16_t base, uint16_t limit, BusReadFunc read,
     devices[num_devices].limit = limit;
     devices[num_devices].read = read;
     devices[num_devices].write = write;
-    printf("[VISC Debug] Added device with base: %u, limit: %u, read: %p, write: %p to the bus\n", base, limit, read, write);
+    printf("[VISC Debug] Added device with base: %u, limit: %u to the bus\n", base, limit);
     num_devices++;
     return true;
 }
