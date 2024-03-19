@@ -1,6 +1,7 @@
 #ifndef __ROM_H__
 #define __ROM_H__
 
+#include "bus.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
