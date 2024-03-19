@@ -58,8 +58,23 @@
 #define FLOAT_CLASS 4
 
 // DATA Instructions
-#define LD 0
-#define ST 1
+#define NOP 0
+#define LD 1
+#define ST 2
+#define LDI 3
+#define LDP 4
+#define STP 5
+
+// ALU Instructions
+#define ADD 0
+#define SUB 1
+#define MUL 2
+#define DIV 3
+#define SHL 4
+#define SHR 5
+#define AND 6
+#define OR 7
+#define XOR 8
 
 typedef struct
 {
