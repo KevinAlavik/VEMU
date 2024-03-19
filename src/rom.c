@@ -3,7 +3,7 @@ char *rom;
 uint16_t rom_base;
 
 uint32_t rom_read(uint16_t addr) { return rom[addr - rom_base]; }
-void rom_write(uint16_t addr, uint8_t data) { return; }
+void rom_write(uint16_t addr, uint32_t data) { return; }
 
 void rom_init(uint16_t base, uint16_t size, FILE *file) {
     rom = (char *)malloc(size);
