@@ -14,9 +14,11 @@ typedef struct
 {
     uint32_t registers[8];
     uint16_t PC;
+    
+    int rom_size;
 } VISC_I;
 
-VISC_I *init_visc();
+VISC_I *init_visc(int rom_size);
 void run_visc(VISC_I *visc);
 
 #endif // __VISC_H__
