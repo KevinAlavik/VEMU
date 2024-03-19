@@ -76,7 +76,7 @@ void run_visc(VISC_I *visc)
     while (shouldRun)
     {
         int addr = visc->PC;
-        if (addr >= MEMORY_SIZE)
+        if (addr >= visc->rom_size)
         {
             printf("[VISC] Program counter exceeded memory size. Halting the CPU.\n");
             shouldRun = false;
