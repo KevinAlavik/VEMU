@@ -4,35 +4,23 @@
 #include "bus.h"
 #include "rom.h"
 
-#define ROM_SIZE 7
-
-int main() {
-    unsigned int rom[ROM_SIZE] = {
-        (8 & 0xFF) | ((0 & 0x0F) << 8) | ((0 & 0x0F) << 12),
-        0x0000001,
-        (8 & 0xFF) | ((1 & 0x0F) << 8) | ((0 & 0x0F) << 12),
-        0x0000001,
-        (0 & 0xFF) | ((1 & 0x0F) << 8) | ((0 & 0x0F) << 12),
-        0x00000000,
-        0x00000009
-    };
-
-    FILE *file = tmpfile();
-    if (file == NULL) {
-        perror("[VEMU] Error creating temporary file");
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
         return 1;
     }
-
-    for (int i = 0; i < ROM_SIZE; i++) {
-        fwrite(&rom[i], sizeof(unsigned int), 1, file);
+    
+    FILE *file = fopen(argv[1], "rb");
+    if (file == NULL) {
+        perror("Error opening ROM file");
+        return 1;
     }
-    fseek(file, 0, SEEK_SET);
 
     fseek(file, 0, SEEK_END);
     long size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    VISC_I *cpu = init_visc(size); 
+    VISC_I *cpu = init_visc();
     rom_init(0x0000, size, file);
     run_visc(cpu);
     
