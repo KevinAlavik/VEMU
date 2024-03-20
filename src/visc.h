@@ -64,7 +64,7 @@
 #define LD 1
 #define ST 2
 #define LDI 3
-#define RESERVED_1 4
+#define SRP 4
 #define RESERVED_2 5
 #define RESERVED_3 6
 #define RESERVED_4 7
