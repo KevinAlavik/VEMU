@@ -3,8 +3,8 @@
 struct Instruction
 {
     uint8_t opcode : 8;
-    uint8_t reg1 : 4;
-    uint8_t reg2 : 4;
+    uint8_t sr1 : 4;
+    uint8_t sr2 : 4;
     uint16_t reserved;
     uint32_t argument;
 };
@@ -148,25 +148,73 @@ void run_visc(VISC_I *visc)
                 printf("[VISC Debug] LDI Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             default:
-                printf("[VISC] Unknown opcode \"%d\"!\n", instr.opcode);
+                printf("[VISC] Unknown DATA opcode \"%d\"!\n", instr.opcode);
                 break;
             }
         }
         else if (a)
         {
-            printf("[VISC] The opcode class labeld \"ALU_CLASS\" is unimpelemented!\n");
+            switch (instr.opcode)
+            {
+            case ADD:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] + visc->curPlane[instr.sr2];
+                printf("[VISC Debug] ADD Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            case SUB:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] - visc->curPlane[instr.sr2];
+                printf("[VISC Debug] SUB Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            case MUL:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] * visc->curPlane[instr.sr2];
+                printf("[VISC Debug] MUL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            case DIV:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] / visc->curPlane[instr.sr2];
+                printf("[VISC Debug] DIV Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            case SHL:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] << visc->curPlane[instr.sr2];
+                printf("[VISC Debug] SHL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            case SHR:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] >> visc->curPlane[instr.sr2];
+                printf("[VISC Debug] SHR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            case AND:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] & visc->curPlane[instr.sr2];
+                printf("[VISC Debug] AND Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            case OR:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] | visc->curPlane[instr.sr2];
+                printf("[VISC Debug] OR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            case XOR:
+                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] ^ visc->curPlane[instr.sr2];
+                printf("[VISC Debug] XOR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            default:
+                printf("[VISC] Unknown ALU opcode \"%d\"!\n", instr.opcode);
+                break;
+            }
         }
+
         else if (j)
         {
             printf("[VISC] The opcode class labeld \"JUMP_CLASS\" is unimpelemented!\n");
+            shouldRun = false;
+            return;
         }
         else if (al)
         {
             printf("[VISC] The opcode class labeld \"ALGORITHM_CLASS\" is unimpelemented!\n");
+            shouldRun = false;
+            return;
         }
         else if (f)
         {
             printf("[VISC] The opcode class labeld \"FLOAT_CLASS\" is unimpelemented!\n");
+            shouldRun = false;
+            return;
         }
 
         switch_plane(visc, 1);
