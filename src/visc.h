@@ -64,8 +64,11 @@
 #define LD 1
 #define ST 2
 #define LDI 3
-#define LDP 4
-#define STP 5
+#define RESERVED_1 4
+#define RESERVED_2 5
+#define RESERVED_3 6
+#define RESERVED_4 7
+#define RESERVED_5 8
 
 // ALU Instructions
 #define ADD 0
