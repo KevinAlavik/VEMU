@@ -117,18 +117,23 @@ void run_visc(VISC_I *visc)
         switch (instr.class)
         {
         case DATA_CLASS:
+            printf("[VISC Debug] DATA_CLASS: true\n");
             d = true;
             break;
         case ALU_CLASS:
+            printf("[VISC Debug] ALU_CLASS: true\n");
             a = true;
             break;
         case JUMP_CLASS:
+            printf("[VISC Debug] JUMP_CLASS: true\n");
             j = true;
             break;
         case ALGORITHM_CLASS:
+            printf("[VISC Debug] ALGORITHM_CLASS: true\n");
             al = true;
             break;
         case FLOAT_CLASS:
+            printf("[VISC Debug] FLOAT_CLASS: true\n");
             f = true;
             break;
         default:
