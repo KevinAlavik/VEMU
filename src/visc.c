@@ -101,7 +101,7 @@ void run_visc(VISC_I *visc)
         switch_plane(visc, 0);
         
         // Avoid going out of bounds
-        if ((addr + 1) >= 0x0000FFFF)
+        if ((addr + 1) >= (ROM_START + ROM_END))
         {
             shouldRun = false;
             return;
