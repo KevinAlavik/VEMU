@@ -138,8 +138,7 @@ void run_visc(VISC_I *visc)
 
         if (d)
         {
-            uint32_t address;
-            uint32_t value;
+            uint32_t data;
 
             switch(instr.opcode) 
             {
@@ -147,18 +146,18 @@ void run_visc(VISC_I *visc)
                 printf("[VISC Debug] NOP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             case LD:
-                address = (uint32_t)instr.data;
-                visc->curPlane[instr.dr] = bus_read(address);
+                data = (uint32_t)instr.data;
+                visc->curPlane[instr.dr] = bus_read(data);
                 printf("[VISC Debug] LD Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             case ST:
-                address = (uint32_t)instr.data;
-                bus_write(address, visc->curPlane[instr.sr1]);
+                data = (uint32_t)instr.data;
+                bus_write(data, visc->curPlane[instr.sr1]);
                 printf("[VISC Debug] ST Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             case LDI:
-                value = (uint32_t)instr.data;
-                visc->curPlane[instr.dr] = value;
+                data = (uint32_t)instr.data;
+                visc->curPlane[instr.dr] = data;
                 printf("[VISC Debug] LDI Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             default:
