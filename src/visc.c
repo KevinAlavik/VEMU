@@ -80,6 +80,7 @@ void run_visc(VISC_I *visc)
         // Avoid going into RAM
         if ((addr + 1) >= 0x0000FFFF)
         {
+            cpu->high_plane[PC] = 0x00000000;
             shouldRun = false;
             return;
         }
