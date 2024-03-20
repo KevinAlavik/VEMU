@@ -50,6 +50,14 @@ VISC_I *init_visc()
         cpu->curPlane[i] = 0x00000000;
     }
     
+    cpu->high_plane[A_SHADOW] = 0x00000000;
+    cpu->high_plane[B_SHADOW] = 0x00000000;
+    cpu->high_plane[C_SHADOW] = 0x00000000;
+    cpu->high_plane[D_SHADOW] = 0x00000000;
+    cpu->high_plane[E_SHADOW] = 0x00000000;
+    cpu->high_plane[F_SHADOW] = 0x00000000;
+    cpu->high_plane[G_SHADOW] = 0x00000000;
+    cpu->high_plane[H_SHADOW] = 0x00000000;
     cpu->high_plane[PC] = 0x00000000;
     return cpu;
 }
