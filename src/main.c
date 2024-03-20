@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     VISC_I *cpu = init_visc();
 
-    // 0x00000000 -> 0x0000FFFF: ROM (for now ofc)
+    // 0x00000000 -> 0x0000FFFF: ROM
     rom_init(0x00000000, 0x0000FFFF, file);
     run_visc(cpu);
 
