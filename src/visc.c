@@ -165,6 +165,12 @@ void run_visc(VISC_I *visc)
                 visc->curPlane[instr.dr] = data;
                 printf("[VISC Debug] LDI Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
+            case SRP:
+                data = (uint32_t)instr.data;
+                switch_plane(cpu, (uint8_t : 1)data);
+                printf("[VISC Debug] SRP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break;
+            
             default:
                 printf("[VISC] Unknown DATA opcode \"%d\"!\n", instr.opcode);
                 break;
