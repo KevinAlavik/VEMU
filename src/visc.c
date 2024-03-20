@@ -128,6 +128,14 @@ void run_visc(VISC_I *visc)
             {
             case NOP:
                 break;
+            case LD:
+                uint32_t addr = (uint32_t)instr.data;
+                visc->curPlane[instr.dr] = addr;
+                break;
+            case ST:
+                uint32_t addr = (uint32_t)instr.data;
+                bus_write(addr, visc->curPlane[instr.sr1]);
+                break;
             default:
                 print("[VISC] Unknown opcode \"%d\"!\n", instr.opcode);
                 break;
