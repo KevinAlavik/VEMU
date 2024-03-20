@@ -75,6 +75,20 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high) {
     return instr;
 }
 
+void package_instruction(Instruction instr, uint32_t *val_low, uint32_t *val_high) {
+    *val_low = 0;
+    *val_high = 0;
+    
+    *val_low |= instr.class & 0xF;
+    *val_low |= (instr.opcode & 0xFF) << 4;
+    *val_low |= (instr.sr1 & 0xF) << 12;
+    *val_low |= (instr.sr2 & 0xF) << 16;
+    *val_low |= (instr.dr & 0xF) << 20;
+    *val_low |= (instr.data & 0xFFFFFFFF) >> 32;
+    
+    *val_high |= (instr.data >> 32) & 0xFFFFFFFF;
+}
+
 void run_visc(VISC_I *visc)
 {
     bool shouldRun = true;
