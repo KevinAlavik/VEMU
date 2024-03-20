@@ -124,7 +124,14 @@ void run_visc(VISC_I *visc)
 
         if (d)
         {
-            printf("[VISC] The opcode class labeld \"DATA_CLASS\" is unimpelemented!\n");
+            switch(instr.opcode) 
+            {
+            case NOP:
+                break;
+            default:
+                print("[VISC] Unknown opcode \"%d\"!\n", instr.opcode);
+                break;
+            }
         }
         else if (a)
         {
