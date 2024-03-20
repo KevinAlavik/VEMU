@@ -64,11 +64,11 @@
 #define LD 1
 #define ST 2
 #define LDI 3
-#define SRP 4
-#define RESERVED_2 5
-#define RESERVED_3 6
-#define RESERVED_4 7
-#define RESERVED_5 8
+#define LDP 4
+#define STP 5
+#define SRP 6
+#define PUSH 7
+#define POP 8
 
 // ALU Instructions
 #define ADD 0
@@ -80,6 +80,13 @@
 #define AND 6
 #define OR 7
 #define XOR 8
+
+// JUMP Instructions
+#define JMP 0
+#define CALL 1
+#define TEST 2
+#define CJ 3
+#define RET 4
 
 typedef struct
 {
