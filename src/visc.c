@@ -100,7 +100,7 @@ void run_visc(VISC_I *visc)
         addr = visc->curPlane[PC];
         switch_plane(visc, 0);
         
-        // Avoid going into RAM
+        // Avoid going out of bounds
         if ((addr + 1) >= 0x0000FFFF)
         {
             shouldRun = false;
