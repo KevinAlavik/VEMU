@@ -46,19 +46,14 @@ VISC_I *init_visc()
 
     cpu->planeNum = 0;
     switch_plane(cpu, cpu->planeNum);
+    
     for(int i = 0; i > PLANE_SIZE; i++) {
-        cpu->curPlane[i] = 0x00000000;
+        cpu->low_plane[i] = 0x00000000;
     }
     
-    cpu->high_plane[A_SHADOW] = 0x00000000;
-    cpu->high_plane[B_SHADOW] = 0x00000000;
-    cpu->high_plane[C_SHADOW] = 0x00000000;
-    cpu->high_plane[D_SHADOW] = 0x00000000;
-    cpu->high_plane[E_SHADOW] = 0x00000000;
-    cpu->high_plane[F_SHADOW] = 0x00000000;
-    cpu->high_plane[G_SHADOW] = 0x00000000;
-    cpu->high_plane[H_SHADOW] = 0x00000000;
-    cpu->high_plane[PC] = 0x00000000;
+    for(int i = 0; i > PLANE_SIZE; i++) {
+        cpu->high_plane[i] = 0x00000000;
+    }
     return cpu;
 }
 
