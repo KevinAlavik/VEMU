@@ -46,42 +46,35 @@ VISC_I *init_visc()
 
     cpu->planeNum = 0;
     switch_plane(cpu, cpu->planeNum);
-    
-    for(int i = 0; i > PLANE_SIZE; i++) {
+
+    for (int i = 0; i > PLANE_SIZE; i++)
+    {
         cpu->low_plane[i] = 0x00000000;
     }
-    
-    for(int i = 0; i > PLANE_SIZE; i++) {
+
+    for (int i = 0; i > PLANE_SIZE; i++)
+    {
         cpu->high_plane[i] = 0x00000000;
     }
     return cpu;
 }
 
-Instruction extract_instruction(uint32_t val_low, uint32_t val_high) {
-    Instruction instr;
-    
-    instr.class = val_low & 0xF;
-    instr.opcode = (val_low >> 4) & 0xFF;
-    instr.sr1 = (val_low >> 12) & 0xF;
-    instr.sr2 = (val_low >> 16) & 0xF;
-    instr.dr = (val_low >> 20) & 0xF;
-    instr.data = ((uint64_t)(val_high) << 32) | val_low >> 24;
+Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
+{
+    Instruction instr = {0};
+
+    instr.imm = val_low;
+    instr.data = (val_low >> 24) & 0xFF;
+    instr.dr = (val_high >> 20) & 0xF;
+    instr.sr2 = (val_high >> 16) & 0xF;
+    instr.sr1 = (val_high >> 12) & 0xF;
+    instr.opcode = (val_high >> 4) & 0xFF;
+    instr.class = val_high & 0xF;
+
+    printf("[VISC Debug] Class: %d, Opcode: %d, SR1: %d, SR2: %d, DR: %d, DATA: %d, IMM: 0x%08X\n",
+           instr.class, instr.opcode, instr.sr1, instr.sr2, instr.dr, instr.data, instr.imm);
 
     return instr;
-}
-
-void package_instruction(Instruction instr, uint32_t *val_low, uint32_t *val_high) {
-    *val_low = 0;
-    *val_high = 0;
-    
-    *val_low |= instr.class & 0xF;
-    *val_low |= (instr.opcode & 0xFF) << 4;
-    *val_low |= (instr.sr1 & 0xF) << 12;
-    *val_low |= (instr.sr2 & 0xF) << 16;
-    *val_low |= (instr.dr & 0xF) << 20;
-    *val_low |= (instr.data & 0xFFFFFFFF) >> 32;
-    
-    *val_high |= (instr.data >> 32) & 0xFFFFFFFF;
 }
 
 void run_visc(VISC_I *visc)
@@ -95,7 +88,7 @@ void run_visc(VISC_I *visc)
         switch_plane(visc, 1);
         addr = visc->curPlane[PC];
         switch_plane(visc, curPlane);
-        
+
         // Avoid going out of bounds
         if ((addr + 1) >= (ROM_START + ROM_END))
         {
@@ -105,7 +98,7 @@ void run_visc(VISC_I *visc)
 
         uint32_t val_low = bus_read(addr);
         uint32_t val_high = bus_read(addr + 1);
-        printf("L: %d, H: %d\n", val_low, val_high);
+        printf("L: 0x%08X, H: 0x%08X\n", val_low, val_high);
 
         Instruction instr = extract_instruction(val_low, val_high);
         bool d, a, j, al, f = false;
@@ -141,7 +134,7 @@ void run_visc(VISC_I *visc)
         {
             uint32_t data;
 
-            switch(instr.opcode) 
+            switch (instr.opcode)
             {
             case NOP:
                 printf("[VISC Debug] NOP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
@@ -166,20 +159,25 @@ void run_visc(VISC_I *visc)
                 data = bus_read(data);
                 visc->curPlane[instr.dr] = data;
                 printf("[VISC Debug] LDP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-                break
+                break;
             case STP:
                 data = visc->curPlane[instr.sr2];
                 uint32_t val = bus_read(data);
                 data = visc->curPlane[instr.sr1];
                 bus_write(data, val);
                 printf("[VISC Debug] STP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-                break
+                break;
             case SRP:
                 data = (uint32_t)instr.data;
-                switch_plane(cpu, (uint8_t : 1)data);
+                switch_plane(visc, (uint8_t)data);
                 printf("[VISC Debug] SRP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
-            
+            case PUSH:
+                data = visc->curPlane[instr.sr1];
+                visc->high_plane[SP]++;
+                break;
+            case POP:
+                break;
             default:
                 printf("[VISC] Unknown DATA opcode \"%d\"!\n", instr.opcode);
                 break;

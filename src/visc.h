@@ -90,12 +90,13 @@
 
 typedef struct
 {
-    uint8_t class : 4;
-    uint8_t opcode;
+    uint32_t imm;
+    uint8_t data;
     uint8_t sr1 : 4;
     uint8_t sr2 : 4;
     uint8_t dr : 4;
-    uint64_t data : 44;
+    uint8_t opcode;
+    uint8_t class;
 } Instruction;
 
 typedef struct

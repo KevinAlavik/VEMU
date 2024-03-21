@@ -46,5 +46,5 @@ uint32_t bus_read(uint32_t addr)
         }
     }
     printf("[VISC Debug] Read address %u out of range or no read function provided\n", addr);
-    return -1;
+    return 0;
 }

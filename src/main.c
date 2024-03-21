@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     }
 
     VISC_I *cpu = init_visc();
-    
+
     rom_init(ROM_START, ROM_END, file);
     run_visc(cpu);
 
