@@ -95,10 +95,11 @@ void run_visc(VISC_I *visc)
 
     while (shouldRun)
     {
+        int curPlane = visc->planeNum;
         int addr;
         switch_plane(visc, 1);
         addr = visc->curPlane[PC];
-        switch_plane(visc, 0);
+        switch_plane(visc, curPlane);
         
         // Avoid going out of bounds
         if ((addr + 1) >= (ROM_START + ROM_END))
@@ -256,6 +257,6 @@ void run_visc(VISC_I *visc)
 
         switch_plane(visc, 1);
         visc->curPlane[PC] += 2;
-        switch_plane(visc, 0);
+        switch_plane(visc, curPlane);
     }
 }
