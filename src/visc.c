@@ -63,13 +63,7 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
 {
     Instruction instr = {0};
 
-    instr.imm = val_low;
-    instr.data = (val_low >> 24) & 0xFF;
-    instr.dr = (val_high >> 20) & 0xF;
-    instr.sr2 = (val_high >> 16) & 0xF;
-    instr.sr1 = (val_high >> 12) & 0xF;
-    instr.opcode = (val_high >> 4) & 0xFF;
-    instr.class = val_high & 0xF;
+    uint64_t i = ((uint64_t)val_high << 32) | val_low;
 
     printf("[VISC Debug] Class: %d, Opcode: %d, SR1: %d, SR2: %d, DR: %d, DATA: %d, IMM: 0x%08X\n",
            instr.class, instr.opcode, instr.sr1, instr.sr2, instr.dr, instr.data, instr.imm);
