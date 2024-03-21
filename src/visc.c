@@ -140,17 +140,17 @@ void run_visc(VISC_I *visc)
                 printf("[VISC Debug] NOP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             case LD:
-                data = (uint32_t)instr.data;
+                data = (uint32_t)instr.imm;
                 visc->curPlane[instr.dr] = bus_read(data);
                 printf("[VISC Debug] LD Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             case ST:
-                data = (uint32_t)instr.data;
+                data = (uint32_t)instr.imm;
                 bus_write(data, visc->curPlane[instr.sr1]);
                 printf("[VISC Debug] ST Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             case LDI:
-                data = (uint32_t)instr.data;
+                data = (uint32_t)instr.imm;
                 visc->curPlane[instr.dr] = data;
                 printf("[VISC Debug] LDI Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
@@ -168,7 +168,7 @@ void run_visc(VISC_I *visc)
                 printf("[VISC Debug] STP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
             case SRP:
-                data = (uint32_t)instr.data;
+                data = (uint32_t)instr.imm;
                 switch_plane(visc, (uint8_t)data);
                 printf("[VISC Debug] SRP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
