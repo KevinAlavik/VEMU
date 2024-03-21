@@ -165,6 +165,19 @@ void run_visc(VISC_I *visc)
                 visc->curPlane[instr.dr] = data;
                 printf("[VISC Debug] LDI Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 break;
+            case LDP:
+                data = visc->curPlane[instr.sr1];
+                data = bus_read(data);
+                visc->curPlane[instr.dr] = data;
+                printf("[VISC Debug] LDP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break
+            case STP:
+                data = visc->curPlane[instr.sr2];
+                uint32_t val = bus_read(data);
+                data = visc->curPlane[instr.sr1];
+                bus_write(data, val);
+                printf("[VISC Debug] STP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                break
             case SRP:
                 data = (uint32_t)instr.data;
                 switch_plane(cpu, (uint8_t : 1)data);
