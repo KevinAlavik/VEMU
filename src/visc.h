@@ -13,7 +13,7 @@
 
 #define PLANE_SIZE 16
 #define ROM_START 0x00000000
-#define ROM_END 0x0000FFFF
+#define ROM_END 0x000000FF
 
 // First Register Plane
 #define A 0

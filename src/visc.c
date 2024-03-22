@@ -72,6 +72,8 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
     instr.opcode = (i >> 4) & 0xFF;
     instr.class = i & 0xF;
 
+
+    printf("L: 0x%08X, H: 0x%08X, FULL: 0x%lX\n", val_low, val_high, i);
     printf("[VISC Debug] Class: %d, Opcode: %d, SR1: %d, SR2: %d, DR: %d, DATA: %d, IMM: 0x%08X\n",
            instr.class, instr.opcode, instr.sr1, instr.sr2, instr.dr, instr.data, instr.imm);
 
@@ -99,7 +101,6 @@ void run_visc(VISC_I *visc)
 
         uint32_t val_low = bus_read(addr);
         uint32_t val_high = bus_read(addr + 1);
-        printf("L: 0x%08X, H: 0x%08X\n", val_low, val_high);
 
         Instruction instr = extract_instruction(val_low, val_high);
         bool d, a, j, al, f = false;
