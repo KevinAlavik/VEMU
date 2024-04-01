@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include "bus.h"
 #include "rom.h"
@@ -88,8 +89,8 @@
 // ALU Instructions
 #define ADD 0
 #define SUB 1
-#define MUL 2           // Multiply extension is needed here (enabled by default)
-#define DIV 3           //
+#define MUL 2 // Multiply extension is needed here (enabled by default)
+#define DIV 3 //
 #define SHL 4
 #define SHR 5
 #define AND 6
@@ -104,8 +105,8 @@
 #define RET 4
 
 // Extensions (A -> Z)
-#define BASIC_SHIT  1       // B
-#define MULTIPLY    2       // M
+#define BASIC_SHIT 1 // B
+#define MULTIPLY 2   // M
 
 typedef struct
 {
@@ -133,5 +134,10 @@ extern bool debug_log;
 VISC_I *init_visc();
 void run_visc(VISC_I *visc, int clock_speed);
 void switch_plane(VISC_I *cpu, int num);
+void enable_extension(VISC_I *cpu, int i);
+void disable_extension(VISC_I *cpu, int i);
+bool extension_enabled(VISC_I *cpu, int i);
+char get_extension_letter(int i);
+int get_extension_id(char *s);
 
 #endif // __VISC_H__

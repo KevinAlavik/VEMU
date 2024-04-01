@@ -11,15 +11,15 @@ uint32_t ram_read(uint32_t addr)
         printf("[VISC] Trying to go out of bounds in RAM!\n");
         return 0;
     }
-    #ifdef DEBUG
-        printf("[VISC Debug] 0x%08X -> 0x%08X\n", addr, ram[addr - ram_base]);
-    #endif
+#ifdef DEBUG
+    printf("[VISC Debug] 0x%08X -> 0x%08X\n", addr, ram[addr - ram_base]);
+#endif
     return ram[addr - ram_base];
 }
 
 void ram_write(uint32_t addr, uint32_t data)
 {
-   ram[addr - ram_base] = data;
+    ram[addr - ram_base] = data;
 }
 
 void ram_init(uint32_t base, uint32_t size)

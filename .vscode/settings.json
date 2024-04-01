@@ -6,6 +6,7 @@
         "stdint.h": "c",
         "visc.h": "c",
         "bridge.h": "c",
-        "uart.h": "c"
+        "uart.h": "c",
+        "cstdlib": "c"
     }
 }

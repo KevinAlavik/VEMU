@@ -8,14 +8,15 @@ bool busEnable = true;
 static struct device devices[MAX_DEVICES];
 static int num_devices = 0;
 
-void disable_buss() {
+void disable_buss()
+{
     busEnable = false;
 }
 
 bool add_device(uint32_t base, uint32_t limit, BusReadFunc read,
                 BusWriteFunc write)
 {
-    if(!busEnable)
+    if (!busEnable)
         return false;
     if (num_devices >= MAX_DEVICES)
     {
@@ -26,16 +27,16 @@ bool add_device(uint32_t base, uint32_t limit, BusReadFunc read,
     devices[num_devices].limit = limit;
     devices[num_devices].read = read;
     devices[num_devices].write = write;
-    #ifdef DEBUG
-        printf("[VISC Debug] Added device with base: %u, limit: %u to the bus\n", base, limit);
-    #endif
+#ifdef DEBUG
+    printf("[VISC Debug] Added device with base: %u, limit: %u to the bus\n", base, limit);
+#endif
     num_devices++;
     return true;
 }
 
 void bus_write(uint32_t addr, uint32_t data)
 {
-    if(!busEnable)
+    if (!busEnable)
         return;
     for (int i = 0; i < num_devices; i++)
     {
@@ -50,7 +51,7 @@ void bus_write(uint32_t addr, uint32_t data)
 
 uint32_t bus_read(uint32_t addr)
 {
-    if(!busEnable)
+    if (!busEnable)
         return -1;
     for (int i = 0; i < num_devices; i++)
     {
