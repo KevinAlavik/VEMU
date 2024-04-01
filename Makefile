@@ -1,6 +1,5 @@
 CC ?= gcc
-CFLAGS := -Wall -pedantic -Werror -Wshadow -Wstrict-aliasing -Wstrict-overflow -O3
-CFLAGS += 
+CFLAGS := -Wall -Wno-newline-eof -pedantic -Werror -Wshadow -Wstrict-aliasing -Wstrict-overflow -O3
 LDFLAGS := 
 
 BIN_DIR := bin
@@ -26,6 +25,11 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(@D)
 	@printf "  CC $<\n"
 	@$(CC) $(CFLAGS) -c $< -o $@
+	
+.PHONY: debug
+debug: CFLAGS += -DDEBUG_LOG
+debug: all
+
 
 .PHONY: install
 install: $(TARGET)
