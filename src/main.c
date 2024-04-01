@@ -94,14 +94,18 @@ int main(int argc, char *argv[]) {
     printf("    Emulator written by Kevin Alavik     \n");
     printf("  Credits to lolguy91 for creating VISC  \n");
     printf("                                         \n");
-    printf("  RAM: %.0f\tKB                          \n", bytes_to_kb(RAM_END - RAM_START));
-    printf("       %.0f\tMB                          \n", bytes_to_mb(RAM_END - RAM_START));
-    printf("       %.0f\tGB                          \n", bytes_to_gb(RAM_END - RAM_START));
+    printf("  RAM:        %.0f\tKB                   \n", bytes_to_kb(RAM_END - RAM_START));
+    printf("              %.0f\tMB                   \n", bytes_to_mb(RAM_END - RAM_START));
+    printf("              %.0f\t\tGB                 \n", bytes_to_gb(RAM_END - RAM_START));
     printf("                                         \n");
-    printf("  ROM: %dB                               \n", ROM_END - ROM_START);
-    printf("  BOOT IMG: \"%s\"                       \n", filename);
-    printf("  SCREEN: false                          \n");
-    printf("  UART:   true                           \n");
+    printf("  FULL:       %.0f\tKB                   \n", bytes_to_kb(0xFFFFFFFF));
+    printf("              %.0f\tMB                   \n", bytes_to_mb(0xFFFFFFFF));
+    printf("              %.0f\t\tGB                 \n", bytes_to_gb(0xFFFFFFFF));
+    printf("                                         \n");
+    printf("  ROM:        %dB                        \n", ROM_END - ROM_START);
+    printf("  BOOT IMG:   \"%s\"                     \n", filename);
+    printf("  SCREEN:     false                      \n");
+    printf("  UART:       true                       \n");
     printf("                                         \n");
     printf("-----------------------------------------\n");
 
