@@ -7,7 +7,7 @@ OBJ_DIR := build
 SRC_DIR := src
 DESTDIR ?= /usr/local/bin
 
-TARGET_NAME := visc
+TARGET_NAME := vemu
 TARGET := $(BIN_DIR)/$(TARGET_NAME)
 
 SRC := $(wildcard $(addsuffix /*.c*, $(SRC_DIR)) $(addsuffix /*.c*, $(SRC_DIR)/devices))

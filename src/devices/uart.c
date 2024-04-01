@@ -46,7 +46,4 @@ void uart_init(uint32_t base, uint32_t size)
 {
     uart_base = base;
     add_device(base, size, uart_read, uart_write);
-
-    // Clear the screen on init
-    bus_write(UART_END, UART_CLEAR);
 }
