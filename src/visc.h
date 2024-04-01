@@ -88,8 +88,8 @@
 // ALU Instructions
 #define ADD 0
 #define SUB 1
-#define RESERVED1 2
-#define RESERVED2 3
+#define MUL 2           // Multiply extension is needed here (enabled by default)
+#define DIV 3           //
 #define SHL 4
 #define SHR 5
 #define AND 6
@@ -102,6 +102,10 @@
 #define TEST 2
 #define CJ 3
 #define RET 4
+
+// Extensions (A -> Z)
+#define BASIC_SHIT  1       // B
+#define MULTIPLY    2       // M
 
 typedef struct
 {
@@ -120,6 +124,7 @@ typedef struct
     uint32_t high_plane[PLANE_SIZE];
     uint8_t planeNum : 1;
     uint32_t *curPlane;
+    uint8_t extensions[26];
 } VISC_I;
 
 extern bool shouldRun;

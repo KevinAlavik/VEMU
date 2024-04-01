@@ -81,13 +81,6 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
-    cpu = init_visc();
-
-    rom_init(ROM_START, ROM_END, file);
-    ram_init(RAM_START, RAM_END);
-
-    syscon_init(SYSCON_START, SYSCON_END);
-    uart_init(UART_START, UART_END);
 
     printf("-----------------------------------------\n");
     printf("               VISC-I ISA                \n");
@@ -108,6 +101,14 @@ int main(int argc, char *argv[]) {
     printf("  UART:       true                       \n");
     printf("                                         \n");
     printf("-----------------------------------------\n");
+    
+    cpu = init_visc();
+
+    rom_init(ROM_START, ROM_END, file);
+    ram_init(RAM_START, RAM_END);
+
+    syscon_init(SYSCON_START, SYSCON_END);
+    uart_init(UART_START, UART_END);
 
     while(runEmu) {
         run_visc(cpu, CLOCK_SPEED);

@@ -43,6 +43,41 @@ void switch_plane(VISC_I *cpu, int num)
         return;
     }
 }
+char get_extension_letter(int i) {
+    switch(i) {
+        case BASIC_SHIT:
+            return 'B';
+        case MULTIPLY:
+            return 'M';
+        default:
+            return '\0';
+    }
+}
+char* get_extension_string(int i) {
+    switch(i) {
+        case BASIC_SHIT:
+            return "BASIC_SHIT";
+        case MULTIPLY:
+            return "MULTIPLY";
+        default:
+            return "Unknown";
+    }
+}
+
+void enable_extension(VISC_I* cpu, int i) {
+    if(cpu != NULL) {
+        cpu->extensions[i] = UINT8_MAX;
+        if(debug_log)
+            printf("[VISC] Enabled \"%s\" extension (%c)\n", get_extension_string(i), get_extension_letter(i));
+    }
+}
+
+bool extension_enabled(VISC_I* cpu, int i) {
+    if(cpu->extensions[i] == UINT8_MAX)
+        return true;
+    else
+        return false;
+}
 
 VISC_I *init_visc()
 {
@@ -65,7 +100,11 @@ VISC_I *init_visc()
     {
         cpu->high_plane[i] = 0x00000000;
     }
+    
     cpu->high_plane[SP] = 0x00000100;
+
+    enable_extension(cpu, BASIC_SHIT);
+    enable_extension(cpu, MULTIPLY);
     return cpu;
 }
 
@@ -214,7 +253,7 @@ void run_visc(VISC_I *visc, int clock_speed)
             break;
         }
 
-        if (d)
+        if (d && extension_enabled(visc, BASIC_SHIT))
         {
             switch (instr.opcode)
             {
@@ -289,7 +328,7 @@ void run_visc(VISC_I *visc, int clock_speed)
                 break;
             }
         }
-        else if (a)
+        else if (a && extension_enabled(visc, BASIC_SHIT))
         {
             switch (instr.opcode)
             {
@@ -305,18 +344,24 @@ void run_visc(VISC_I *visc, int clock_speed)
                     printf("[VISC Debug] SUB Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 
                 break;
-            // case MUL:
-            //     visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] * visc->curPlane[instr.sr2];
-            //     if(debug_log)
-            //         printf("[VISC Debug] MUL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-            //     
-            //     break;
-            // case DIV:
-            //     visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] / visc->curPlane[instr.sr2];
-            //     if(debug_log)
-            //         printf("[VISC Debug] DIV Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-            //     
-            //     break;
+            case MUL:
+                if(extension_enabled(visc, MULTIPLY)) {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] * visc->curPlane[instr.sr2];
+                    if(debug_log)
+                        printf("[VISC Debug] MUL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                } else {
+                    printf("[VISC] A MUL instruction tried to be executed at 0x%08X. Need to enable MULTIPLY!\n", visc->high_plane[PC]);
+                }
+                break;
+            case DIV:
+                if(extension_enabled(visc, MULTIPLY)) {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] / visc->curPlane[instr.sr2];
+                    if(debug_log)
+                        printf("[VISC Debug] DIV Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                } else {
+                    printf("[VISC] A DIV instruction tried to be executed at 0x%08X. Need to enable MULTIPLY!\n", visc->high_plane[PC]);
+                }
+                break;
             case SHL:
                 visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] << visc->curPlane[instr.sr2];
                 if(debug_log)

@@ -187,9 +187,9 @@ void extract_instruction(uint32_t val_low, uint32_t val_high)
             - SR2 - Source register 2
             - DR - Destination register
     3. **RESERVED**
-        - **Description**: Reserved
+        - **Description**: Reserved, MUL (Needs the MULTIPLY extension)
     4. **RESERVED**
-        - **Description**: Reserved
+        - **Description**: Reserved, DIV (Needs the MULTIPLY extension)
     5. **SHL**
         - **Description**: Shifts the value of SR1 left by the value of SR2 bits and stores the result in DR
         - **Parameters**:
@@ -223,13 +223,13 @@ void extract_instruction(uint32_t val_low, uint32_t val_high)
 
 ### Instruction Set (Multiply extension)
 - **CLASS_ALU**
-    1. **MUL**
+    1. **MUL** (3)
         - **Description**: Multiplies the value of SR1 by the value of SR2 and stores the result in DR
         - **Parameters**:
             - SR1 - Source register 1
             - SR2 - Source register 2
             - DR - Destination register
-    2. **DIV**
+    2. **DIV** (4)
         - **Description**: Divides the value of SR1 by the value of SR2 and stores the result in DR
         - **Parameters**:
             - SR1 - Source register 1
