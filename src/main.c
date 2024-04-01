@@ -100,6 +100,8 @@ int main(int argc, char *argv[]) {
     printf("                                         \n");
     printf("  ROM: %dB                               \n", ROM_END - ROM_START);
     printf("  BOOT IMG: \"%s\"                       \n", filename);
+    printf("  SCREEN: false                          \n");
+    printf("  UART:   true                           \n");
     printf("                                         \n");
     printf("-----------------------------------------\n");
 
