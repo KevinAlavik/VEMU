@@ -15,5 +15,6 @@
 
 extern VISC_I *cpu;
 extern bool runEmu;
+extern bool dump;
 
 #endif // __BRIDGE_H__

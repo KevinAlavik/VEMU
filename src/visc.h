@@ -123,6 +123,7 @@ typedef struct
 } VISC_I;
 
 extern bool shouldRun;
+extern bool debug_log;
 
 VISC_I *init_visc();
 void run_visc(VISC_I *visc, int clock_speed);

@@ -4,15 +4,16 @@ A VISC-I ISA emulator built in C.
 *Example running roms/test.bin*
 
 ## Building
-To build VEMU run `make` but to build with debug logging do `make debug`. If you want no debug logging but still want to see the registers last values (dump). Then run `make dump`
-
-**To dump the registers you dont need to build with dump, you can run using the -d (--dump) option in VEMU**
+To build VEMU run `make`.
 
 ## Installing
 To install just run `make install` then `vemu -v`
 
 ## Usage
 `Usage: vemu [OPTION]... [FILE]`
+
+## Debuting
+To enable debug logging run the emulator with the `-l` flag. To enable register dumping run with the `-d` flag. To dump the entire ROM region in memory (after running) add the `-r`flag.
 
 ## Arch
 This follows the VISC arch see [SPECS.md](SPECS.md).

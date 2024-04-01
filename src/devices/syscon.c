@@ -14,24 +14,22 @@ void syscon_write(uint32_t addr, uint32_t data)
 {
     switch(data) {
         case SYSCON_SHUTDOWN:
-            #ifdef DEBUG_LOG
+            if(debug_log)
                 printf("[VISC - Syscon] Triggered SHUTDOWN!\n");
-            #endif
             shouldRun = false;
             runEmu = false;         // Make sure to kill the emulator too
             // Dump all registers if we want
-            #ifdef DUMP_REGS
+            if(dump) {
                 cpu->low_plane[A1] = LPLANE;
                 bus_write(SYSCON_START, SYSCON_DUMP);
                 cpu->low_plane[A1] = HPLANE;
                 bus_write(SYSCON_START, SYSCON_DUMP);
-            #endif
+            }
             busEnable = false;      // Disable any bus actions
             break;
         case SYSCON_RESET:
-            #ifdef DEBUG_LOG
+            if(debug_log)
                 printf("[VISC - Syscon] Triggered RESET!\n");
-            #endif
             cpu->planeNum = 0;
             switch_plane(cpu, cpu->planeNum);
 
@@ -47,9 +45,8 @@ void syscon_write(uint32_t addr, uint32_t data)
             cpu->high_plane[SP] = 0x00000100;
             break;
        case SYSCON_DUMP:
-            #ifdef DEBUG_LOG
+            if(debug_log)
                 printf("[VISC - Syscon] Triggered DUMP!\n");
-            #endif
             if (cpu->low_plane[A1] == 0) {
                 switch_plane(cpu, 0);
                 uart_print("A: 0x%08X\n", cpu->curPlane[A]);
