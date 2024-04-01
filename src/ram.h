@@ -6,6 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void rom_init(uint32_t base, uint32_t size, FILE *rom);
+void ram_init(uint32_t base, uint32_t size, FILE *rom);
 
 #endif // __ROM_H__

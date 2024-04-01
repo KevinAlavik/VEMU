@@ -12,8 +12,14 @@
 #include "rom.h"
 
 #define PLANE_SIZE 16
+
+// Memory Layout
 #define ROM_START 0x00000000
 #define ROM_END 0x000000FF
+#define RAM_START 0x00000100
+#define RAM_END 0x80000000
+#define DEVICE_START 0x80000000
+#define DEVICE_END 0xFFFFFFFF
 
 // First Register Plane
 #define A 0

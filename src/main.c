@@ -4,6 +4,7 @@
 #include "visc.h"
 #include "bus.h"
 #include "rom.h"
+#include "ram.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,6 +24,8 @@ int main(int argc, char *argv[])
     VISC_I *cpu = init_visc();
 
     rom_init(ROM_START, ROM_END, file);
+    ram_init(RAM_START, RAM_END);
+
     run_visc(cpu);
 
     char *p;

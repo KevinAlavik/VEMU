@@ -57,6 +57,7 @@ VISC_I *init_visc()
     {
         cpu->high_plane[i] = 0x00000000;
     }
+    cpu->high_plane[SP] = 0x00000100;
     return cpu;
 }
 
