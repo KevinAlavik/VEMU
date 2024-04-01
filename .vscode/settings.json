@@ -4,6 +4,8 @@
         "compare": "c",
         "cstdint": "c",
         "stdint.h": "c",
-        "visc.h": "c"
+        "visc.h": "c",
+        "bridge.h": "c",
+        "uart.h": "c"
     }
 }

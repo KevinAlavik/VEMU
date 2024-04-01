@@ -1,5 +1,6 @@
 #include "visc.h"
 VISC_I *temp;
+bool shouldRun = true;
 
 struct Instruction
 {
@@ -20,9 +21,15 @@ void switch_plane(VISC_I *cpu, int num)
         {
         case 0:
             cpu->curPlane = cpu->low_plane;
+            #ifdef DEBUG_LOG
+                printf("[VISC] Switched to LPLANE!\n");
+            #endif
             break;
         case 1:
             cpu->curPlane = cpu->high_plane;
+            #ifdef DEBUG_LOG
+                printf("[VISC] Switched to HPLANE!\n");
+            #endif
             break;
         default:
             printf("[VISC] Invalid plane number \"%d\"", cpu->planeNum);
@@ -131,20 +138,22 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
 
 void run_visc(VISC_I *visc)
 {
-    bool shouldRun = true;
+    shouldRun = true;
     temp = visc;
 
     while (shouldRun)
     {
-        int curPlane = visc->planeNum;
         int addr;
-        switch_plane(visc, 1);
-        addr = visc->curPlane[PC];
-        switch_plane(visc, curPlane);
+        uint32_t data;
+        
+        addr = visc->high_plane[PC];
 
         // Avoid going out of bounds
         if ((addr + 1) >= (ROM_START + ROM_END))
         {
+            #ifdef DEBUG_LOG
+                printf("[VISC] Reached end of ROM \"0x%08X\"\n", (ROM_START + ROM_END));
+            #endif
             shouldRun = false;
             return;
         }
@@ -159,7 +168,6 @@ void run_visc(VISC_I *visc)
         bool al = false;
         bool f = false;
 
-        uint32_t data;
         
         switch (instr.class)
         {
@@ -375,8 +383,6 @@ void run_visc(VISC_I *visc)
             return;
         }
 
-        switch_plane(visc, 1);
-        visc->curPlane[PC] += 2;
-        switch_plane(visc, curPlane);
+        visc->high_plane[PC] += 2;
     }
 }

@@ -10,7 +10,7 @@ DESTDIR ?= /usr/local/bin
 TARGET_NAME := visc
 TARGET := $(BIN_DIR)/$(TARGET_NAME)
 
-SRC := $(foreach x, $(SRC_DIR), $(wildcard $(addprefix $(x)/*,.c*)))
+SRC := $(wildcard $(addsuffix /*.c*, $(SRC_DIR)) $(addsuffix /*.c*, $(SRC_DIR)/devices))
 OBJ := $(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 
 .PHONY: all
@@ -21,6 +21,11 @@ $(TARGET): $(OBJ)
 	@printf "  LD $(notdir $@)\n"
 	@$(CC) $(LDFLAGS) $(OBJ) -o $@
 
+$(OBJ_DIR)/%.o: $(SRC_DIR)/devices/%.c
+	@mkdir -p $(@D)
+	@printf "  CC $<\n"
+	@$(CC) $(CFLAGS) -c $< -o $@
+
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(@D)
 	@printf "  CC $<\n"
@@ -29,7 +34,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 .PHONY: debug
 debug: CFLAGS += -DDEBUG_LOG
 debug: all
-
 
 .PHONY: install
 install: $(TARGET)

@@ -11,6 +11,7 @@
 #include "bus.h"
 #include "rom.h"
 
+// Config
 #define PLANE_SIZE 16
 
 // Memory Layout
@@ -20,6 +21,10 @@
 #define RAM_END 0x80000000
 #define DEVICE_START 0x80000000
 #define DEVICE_END 0xFFFFFFFF
+
+// Labels
+#define HPLANE 1
+#define LPLANE 0
 
 // First Register Plane
 #define A 0
@@ -112,6 +117,8 @@ typedef struct
     uint8_t planeNum : 1;
     uint32_t *curPlane;
 } VISC_I;
+
+extern bool shouldRun;
 
 VISC_I *init_visc();
 void run_visc(VISC_I *visc);
