@@ -1,8 +1,8 @@
 # VISC-I Devices
 **Todo**
 - Device Parameter Registers:
-    - G
-    - H
+    - A1
+    - A2
 ## Default Devices
 - Timer
     - Unimpelemented, waiting for interupts.
@@ -13,7 +13,7 @@
         |--------------------|------|-----------------------|-----------------------------------------------------------|
         | Shutdown           | 0x01 |                       |                                                           |
         | Reset              | 0x02 |                       | Reboots the CPU, resets all registers (HPLANE and LPLANE) |
-        | Dump (UART Needed) | 0x03 | G: Plane (2 for both) | Physical access to register block is needed               |
+        | Dump (UART Needed) | 0x03 | A1: Plane (2 for both) | Physical access to register block is needed               |
 
 ## Optional Devices
 - UART
@@ -21,5 +21,5 @@
     - Commands:
         | Name  | ID   | Parameters            | Note |
         |-------|------|-----------------------|------|
-        | Write | 0x01 | G: Character to write |      |
+        | Write | 0x01 | A1: Character to write |      |
         | Clear | 0x02 |                       |      |

@@ -136,7 +136,13 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
     return instr;
 }
 
-void run_visc(VISC_I *visc)
+// Emulate a delay in Mhz
+void delay_mhz(unsigned int frequency_mhz) {
+    unsigned int delay_microseconds = 1000000 / frequency_mhz;
+    usleep(delay_microseconds);
+}
+
+void run_visc(VISC_I *visc, int clock_speed)
 {
     shouldRun = true;
     temp = visc;
@@ -384,5 +390,6 @@ void run_visc(VISC_I *visc)
         }
 
         visc->high_plane[PC] += 2;
+        delay_mhz(clock_speed);
     }
 }

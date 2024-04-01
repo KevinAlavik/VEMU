@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "bus.h"
 #include "rom.h"
@@ -121,7 +123,7 @@ typedef struct
 extern bool shouldRun;
 
 VISC_I *init_visc();
-void run_visc(VISC_I *visc);
+void run_visc(VISC_I *visc, int clock_speed);
 void switch_plane(VISC_I *cpu, int num);
 
 #endif // __VISC_H__

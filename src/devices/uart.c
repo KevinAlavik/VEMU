@@ -19,7 +19,7 @@ void uart_print(const char* fmt, ...) {
 
     const char* ptr = output;
     while (*ptr != '\0') {
-        cpu->low_plane[G] = *ptr;
+        cpu->low_plane[A1] = *ptr;
         bus_write(0x80000003, 0x01);
         ptr++;
     }
@@ -30,7 +30,7 @@ void uart_write(uint32_t addr, uint32_t data)
 {
     switch(data) {
         case UART_WRITE:
-            printf("%c", (char)cpu->low_plane[G]);
+            printf("%c", (char)cpu->low_plane[A1]);
             break;
         case UART_CLEAR:
             printf("\033[2J");
@@ -46,4 +46,5 @@ void uart_init(uint32_t base, uint32_t size)
 {
     uart_base = base;
     add_device(base, size, uart_read, uart_write);
+    bus_write(0x80000003, 0x02);
 }
