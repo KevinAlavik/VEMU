@@ -84,8 +84,8 @@
 // ALU Instructions
 #define ADD 0
 #define SUB 1
-#define MUL 2
-#define DIV 3
+#define RESERVED1 2
+#define RESERVED2 3
 #define SHL 4
 #define SHR 5
 #define AND 6

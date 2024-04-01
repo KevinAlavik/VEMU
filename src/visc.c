@@ -297,18 +297,18 @@ void run_visc(VISC_I *visc)
                     printf("[VISC Debug] SUB Instruction executed at 0x%08X\n", visc->high_plane[PC]);
                 #endif
                 break;
-            case MUL:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] * visc->curPlane[instr.sr2];
-                #ifdef DEBUG_LOG
-                    printf("[VISC Debug] MUL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-                #endif
-                break;
-            case DIV:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] / visc->curPlane[instr.sr2];
-                #ifdef DEBUG_LOG
-                    printf("[VISC Debug] DIV Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-                #endif
-                break;
+            // case MUL:
+            //     visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] * visc->curPlane[instr.sr2];
+            //     #ifdef DEBUG_LOG
+            //         printf("[VISC Debug] MUL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+            //     #endif
+            //     break;
+            // case DIV:
+            //     visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] / visc->curPlane[instr.sr2];
+            //     #ifdef DEBUG_LOG
+            //         printf("[VISC Debug] DIV Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+            //     #endif
+            //     break;
             case SHL:
                 visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] << visc->curPlane[instr.sr2];
                 #ifdef DEBUG_LOG
