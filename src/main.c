@@ -31,14 +31,17 @@ int main(int argc, char *argv[]) {
         printf("Options:\n");
         printf("  -h, --help           display this help and exit\n");
         printf("  -v, --version        output version information and exit\n");
+        printf("  -i, --info           outputs the info box\n");
         printf("  -d, --dump           dumps the register on shutdown\n");
         printf("  -l, --debug          enable debug logging in the emulator\n");
         printf("  -r, --dump-rom       dumps the memory region with the ROM\n");
+        printf("  -ld, --devices       lists all available devices\n");
         return 1;
     }
 
     char* filename = NULL;
     bool dumpm = false;
+    bool info = false;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
@@ -50,17 +53,27 @@ int main(int argc, char *argv[]) {
             printf("Options:\n");
             printf("  -h, --help           display this help and exit\n");
             printf("  -v, --version        output version information and exit\n");
+            printf("  -i, --info           outputs the info box\n");
             printf("  -d, --dump           dumps the register on shutdown\n");
             printf("  -l, --debug          enable debug logging in the emulator\n");
             printf("  -r, --dump-rom       dumps the memory region with the ROM\n");
+            printf("  -ld, --devices       lists all available devices\n");
             return 0;
         } else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--dump") == 0) {
             dump = true;
         } else if (strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--debug") == 0) {
             debug_log = true;
         }  else if (strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--dump-rom") == 0) {
-           dumpm = true;
-        } else {
+            dumpm = true;
+        }  else if (strcmp(argv[i], "-i") == 0 || strcmp(argv[i], "--info") == 0) {
+            info = true;
+        }  else if (strcmp(argv[i], "-ld") == 0 || strcmp(argv[i], "--devices") == 0) {
+            printf("VEMU (%s) v0.1.4\n", __DATE__);
+            printf("Devices:\n");
+            printf("  - SYSCON:\t0x80000001\n");
+            printf("  - UART:\t0x80000003\n\n");
+            return 0;
+        }  else {
             if (argv[i][0] == '-' || (argv[i][0] == '-' && argv[i][1] == '-')) {
                 printf("Invalid option \"%s\"\n", argv[i]);
                 return EXIT_FAILURE;
@@ -81,27 +94,33 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
 
+    if(info) {
+        printf("-----------------------------------------\n");
+        printf("               VISC-I ISA                \n");
+        printf("    Emulator written by Kevin Alavik     \n");
+        printf("  Credits to lolguy91 for creating VISC  \n");
+        printf("                                         \n");
+        printf("  RAM:        %.0f\tKB                   \n", bytes_to_kb(RAM_END - RAM_START));
+        printf("              %.0f\tMB                   \n", bytes_to_mb(RAM_END - RAM_START));
+        printf("              %.0f\t\tGB                 \n", bytes_to_gb(RAM_END - RAM_START));
+        printf("                                         \n");
+        printf("  FULL:       %.0f\tKB                   \n", bytes_to_kb(0xFFFFFFFF));
+        printf("              %.0f\tMB                   \n", bytes_to_mb(0xFFFFFFFF));
+        printf("              %.0f\t\tGB                 \n", bytes_to_gb(0xFFFFFFFF));
+        printf("                                         \n");
+        printf("  ROM:        %dB                        \n", ROM_END - ROM_START);
+        printf("  BOOT IMG:   \"%s\"                     \n", filename);
+        printf("                                         \n");
+        printf("  EXTENSIONS:                            \n");
+        printf("    - [x] BASIC_SHIT                     \n");
+        printf("    - [x] MULTIPLY                       \n");
+        printf("                                         \n");
+        printf("  SCREEN:     false                      \n");
+        printf("  UART:       true                       \n");
+        printf("                                         \n");
+        printf("-----------------------------------------\n");
+    }
 
-    printf("-----------------------------------------\n");
-    printf("               VISC-I ISA                \n");
-    printf("    Emulator written by Kevin Alavik     \n");
-    printf("  Credits to lolguy91 for creating VISC  \n");
-    printf("                                         \n");
-    printf("  RAM:        %.0f\tKB                   \n", bytes_to_kb(RAM_END - RAM_START));
-    printf("              %.0f\tMB                   \n", bytes_to_mb(RAM_END - RAM_START));
-    printf("              %.0f\t\tGB                 \n", bytes_to_gb(RAM_END - RAM_START));
-    printf("                                         \n");
-    printf("  FULL:       %.0f\tKB                   \n", bytes_to_kb(0xFFFFFFFF));
-    printf("              %.0f\tMB                   \n", bytes_to_mb(0xFFFFFFFF));
-    printf("              %.0f\t\tGB                 \n", bytes_to_gb(0xFFFFFFFF));
-    printf("                                         \n");
-    printf("  ROM:        %dB                        \n", ROM_END - ROM_START);
-    printf("  BOOT IMG:   \"%s\"                     \n", filename);
-    printf("  SCREEN:     false                      \n");
-    printf("  UART:       true                       \n");
-    printf("                                         \n");
-    printf("-----------------------------------------\n");
-    
     cpu = init_visc();
 
     rom_init(ROM_START, ROM_END, file);
