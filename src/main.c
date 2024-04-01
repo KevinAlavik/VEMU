@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
         printf("  -i,  --info                outputs the info box\n");
         printf("  -d,  --dump                dumps the register on shutdown\n");
         printf("  -l,  --debug               enable debug logging in the emulator\n");
+        printf("  -s,  --step                enable step mode");
         printf("  -r,  --dump-rom            dumps the memory region with the ROM\n");
         printf("  -ld, --devices             lists all available devices\n");
         printf("  -mm, --memory-map          outputs the memory map in a easy to read format\n");
@@ -113,6 +114,7 @@ int main(int argc, char *argv[])
             printf("  -i,  --info                outputs the info box\n");
             printf("  -d,  --dump                dumps the register on shutdown\n");
             printf("  -l,  --debug               enable debug logging in the emulator\n");
+            printf("  -s,  --step                enable step mode");
             printf("  -r,  --dump-rom            dumps the memory region with the ROM\n");
             printf("  -ld, --devices             lists all available devices\n");
             printf("  -mm, --memory-map          outputs the memory map in a easy to read format\n");
@@ -127,6 +129,10 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--debug") == 0)
         {
             debug_log = true;
+        }
+        else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--step") == 0)
+        {
+            debug_step = true;
         }
         else if (strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--dump-rom") == 0)
         {

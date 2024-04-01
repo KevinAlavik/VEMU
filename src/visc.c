@@ -1,7 +1,9 @@
 #include "visc.h"
+
 VISC_I *temp;
 bool shouldRun = true;
 bool debug_log = false;
+bool debug_step = false;
 
 struct Instruction
 {
@@ -521,6 +523,14 @@ void run_visc(VISC_I *visc, int clock_speed)
         }
 
         visc->high_plane[PC] += 2;
-        delay_mhz(clock_speed);
+        if (debug_step)
+        {
+            char c;
+            scanf("%c", &c);
+        }
+        else
+        {
+            delay_mhz(clock_speed);
+        }
     }
 }
