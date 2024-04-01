@@ -32,8 +32,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 	
 .PHONY: debug
-debug: CFLAGS += -DDEBUG_LOG
+debug: CFLAGS += -DDEBUG_LOG -DDUMP_REGS
 debug: all
+
+.PHONY: dump
+dump: CFLAGS += -DDUMP_REGS
+dump: all
 
 .PHONY: install
 install: $(TARGET)

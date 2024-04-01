@@ -15,6 +15,8 @@ struct device
     BusWriteFunc write;
 };
 
+extern bool busEnable;
+
 bool add_device(uint32_t base, uint32_t limit, BusReadFunc read,
                 BusWriteFunc write);
 void bus_write(uint32_t addr, uint32_t data);

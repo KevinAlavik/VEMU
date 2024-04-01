@@ -20,7 +20,7 @@ void uart_print(const char* fmt, ...) {
     const char* ptr = output;
     while (*ptr != '\0') {
         cpu->low_plane[A1] = *ptr;
-        bus_write(0x80000003, 0x01);
+        bus_write(UART_START, UART_WRITE);
         ptr++;
     }
 }
@@ -46,5 +46,7 @@ void uart_init(uint32_t base, uint32_t size)
 {
     uart_base = base;
     add_device(base, size, uart_read, uart_write);
-    bus_write(0x80000003, 0x02);
+
+    // Clear the screen on init
+    bus_write(UART_END, UART_CLEAR);
 }

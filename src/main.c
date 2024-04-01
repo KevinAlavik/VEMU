@@ -1,6 +1,6 @@
 #include "bridge.h"
 
-#define CLOCK_SPEED 50
+#define CLOCK_SPEED 10
 
 VISC_I *cpu;
 bool runEmu = true; 
@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
     rom_init(ROM_START, ROM_END, file);
     ram_init(RAM_START, RAM_END);
 
-    syscon_init(0x80000001, 0x80000002);
-    uart_init(0x80000003, 0x80000004);
+    syscon_init(SYSCON_START, SYSCON_END);
+    uart_init(UART_START, UART_END);
 
     uart_print("-----------------------------------------\n");
     uart_print("               VISC-I ISA                \n");
@@ -56,18 +56,13 @@ int main(int argc, char *argv[])
     uart_print("       %.0f\tGB                          \n", bytes_to_gb(RAM_END - RAM_START));
     uart_print("                                         \n");
     uart_print("  ROM: %dB                               \n", ROM_END - ROM_START);
+    uart_print("  BOOT IMG: \"%s\"                       \n", argv[1]);
     uart_print("                                         \n");
     uart_print("-----------------------------------------\n");
 
-    run_visc(cpu, CLOCK_SPEED);
-
-    cpu->low_plane[A1] = LPLANE;
-    bus_write(0x80000001, SYSCON_DUMP);
-    cpu->low_plane[A1] = HPLANE;
-    bus_write(0x80000001, SYSCON_DUMP);
-
     while(runEmu) {
-        bus_write(0x80000001, SYSCON_SHUTDOWN);
+        run_visc(cpu, CLOCK_SPEED);
+        bus_write(SYSCON_START, SYSCON_SHUTDOWN);
     }
 
     fclose(file);

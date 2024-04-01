@@ -138,7 +138,7 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
 
 // Emulate a delay in Mhz
 void delay_mhz(unsigned int frequency_mhz) {
-    unsigned int delay_microseconds = 1000000 / frequency_mhz;
+    unsigned int delay_microseconds = 1000000 / (frequency_mhz*10);
     usleep(delay_microseconds);
 }
 

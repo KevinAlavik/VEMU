@@ -18,7 +18,15 @@ void syscon_write(uint32_t addr, uint32_t data)
                 printf("[VISC - Syscon] Triggered SHUTDOWN!\n");
             #endif
             shouldRun = false;
-            runEmu = false; // Make sure to kill the emulator too
+            runEmu = false;         // Make sure to kill the emulator too
+            // Dump all registers if we want
+            #ifdef DUMP_REGS
+                cpu->low_plane[A1] = LPLANE;
+                bus_write(SYSCON_START, SYSCON_DUMP);
+                cpu->low_plane[A1] = HPLANE;
+                bus_write(SYSCON_START, SYSCON_DUMP);
+            #endif
+            busEnable = false;      // Disable any bus actions
             break;
         case SYSCON_RESET:
             #ifdef DEBUG_LOG
