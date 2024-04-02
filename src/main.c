@@ -354,6 +354,7 @@ int main(int argc, char *argv[])
     while (runEmu)
     {
         run_visc(cpu, clock_speed);
+        // Make sure to kill the CPU and emulator.
         bus_write(SYSCON_START, SYSCON_SHUTDOWN);
     }
 
