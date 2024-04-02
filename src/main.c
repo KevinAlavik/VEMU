@@ -93,23 +93,23 @@ void usage(char *s)
     printf("Usage: %s [OPTION]... [FILE]\n", s);
     printf("Emulate a VISC-I ISA CPU.\n\n");
     printf("Options:\n");
-    printf("  -h,   --help                display this help and exit\n");
-    printf("  -v,   --version             output version information and exit\n");
-    printf("  -i,   --info                outputs the info box\n");
-    printf("  -d,   --dump                dumps the register on shutdown\n");
-    printf("  -l,   --debug               enable debug logging in the emulator\n");
-    printf("  -s,   --step                enable step mode\n");
-    printf("  -r,   --dump-rom            dumps the memory region with the ROM\n");
-    printf("  -ld,  --devices             lists all available devices\n");
-    printf("  -mm,  --memory-map          outputs the memory map in a easy to read format\n");
-    printf("  -le,  --list-extensions     outputs all available extensions \n");
-    printf("  -e,   --extensions          manage extensions (enable, disable, list)\n");
-    printf("  -ud,  --uart-disable        disable the builtin UART device\n");
-    printf("  -ue,  --uart-enable         enable the builtin UART device (enabled by default)\n");
-    printf("  -sd,  --syscon-disable      disable the builtin SYSCON device\n");
-    printf("  -se,  --syscon-enable       enable the builtin SYSCON device (enabled by default)\n");
-    printf("  -rs,  --rom-size            sets the ROM size (0xFF by default)\n");
-    printf("  -c,   --clock-speed         sets the clock speed (10 by default. 0 for as fast as possible)\n");
+    printf("  -h,   --help                                          display this help and exit\n");
+    printf("  -v,   --version                                       output version information and exit\n");
+    printf("  -i,   --info                                          outputs the info box\n");
+    printf("  -d,   --dump                                          dumps the register on shutdown\n");
+    printf("  -l,   --debug                                         enable debug logging in the emulator\n");
+    printf("  -s,   --step                                          enable step mode\n");
+    printf("  -r,   --dump-rom                                      dumps the memory region with the ROM\n");
+    printf("  -ld,  --devices                                       lists all available devices\n");
+    printf("  -mm,  --memory-map                                    outputs the memory map in a easy to read format\n");
+    printf("  -le,  --list-extensions                               outputs all available extensions \n");
+    printf("  -e,   --extensions        [enable/disable/list]       manage extensions (enable, disable, list)\n");
+    printf("  -ud,  --uart-disable                                  disable the builtin UART device\n");
+    printf("  -ue,  --uart-enable                                   enable the builtin UART device (enabled by default)\n");
+    printf("  -sd,  --syscon-disable                                disable the builtin SYSCON device\n");
+    printf("  -se,  --syscon-enable                                 enable the builtin SYSCON device (enabled by default)\n");
+    printf("  -rs,  --rom-size          [size]                      sets the ROM size (0xFF by default)\n");
+    printf("  -c,   --clock-speed       [speed]                     sets the clock speed (10 by default. 0 for as fast as possible)\n");
 }
 
 // Emulator entry
@@ -356,13 +356,15 @@ int main(int argc, char *argv[])
         bus_write(SYSCON_START, SYSCON_SHUTDOWN);
     }
 
-    // TODO: Dont make it need to enable the buss after shutdown, this should'nt be possible if the CPU is powered of
+    // force enable UART to dump becuz im lazy.
     if (dump)
     {
+        uartEnabled = true;
         busEnable = true;
         cpu->low_plane[A1] = 2; // Dump all pages
         bus_write(SYSCON_START, SYSCON_DUMP);
         busEnable = false;
+        uartEnabled = false;
     }
 
     if (dumpm)

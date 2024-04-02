@@ -144,7 +144,7 @@ VISC_I *init_visc()
     cpu->high_plane[SP] = 0x00000100;
 
     enable_extension(cpu, BASIC_SHIT);
-    enable_extension(cpu, MULTIPLY);
+    disable_extension(cpu, MULTIPLY); // Disable as default
     return cpu;
 }
 
