@@ -307,21 +307,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (filename == NULL)
-    {
-        printf("[VISC] \x1B[31mERROR\x1B[0m No input file specified\n");
-        return EXIT_FAILURE;
-    }
-
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL)
-    {
-        perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM file");
-        return EXIT_FAILURE;
-    }
-
-    rom_init(ROM_START, rom_size, file);
-
     if (info)
     {
         printf("-----------------------------------------\n");
@@ -337,8 +322,7 @@ int main(int argc, char *argv[])
         printf("              %.0f\tMB                   \n", bytes_to_mb(0xFFFFFFFF));
         printf("              %.0f\t\tGB                 \n", bytes_to_gb(0xFFFFFFFF));
         printf("                                         \n");
-        printf("  ROM:        %dB                        \n", ROM_END - ROM_START);
-        printf("  BOOT IMG:   \"%s\"                     \n", filename);
+        printf("  ROM:        %dB                        \n", ROM_END - rom_size);
         printf("                                         \n");
         printf("  EXTENSIONS:                            \n");
         printf("    - [%s] BASIC_SHIT                    \n", extension_enabled(cpu, BASIC_SHIT) ? "X" : " ");
@@ -351,6 +335,20 @@ int main(int argc, char *argv[])
         printf("-----------------------------------------\n");
     }
 
+    if (filename == NULL)
+    {
+        printf("[VISC] \x1B[31mERROR\x1B[0m No input file specified\n");
+        return EXIT_FAILURE;
+    }
+
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL)
+    {
+        perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM file");
+        return EXIT_FAILURE;
+    }
+
+    rom_init(ROM_START, rom_size, file);
     while (runEmu)
     {
         run_visc(cpu, clock_speed);
