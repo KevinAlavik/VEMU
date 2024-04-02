@@ -634,20 +634,52 @@ void run_visc(VISC_I *visc, int clock_speed)
             switch (instr.opcode)
             {
             case JMP:
-                visc->high_plane[PC] = instr.imm;
-                if (debug_log)
-                    printf("[VISC Debug] JMP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->high_plane[PC] = instr.imm;
+                    if (debug_log)
+                        printf("[VISC Debug] JMP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
 
-                break;
+                    break;
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
             case CALL:
-                data = visc->high_plane[PC];
-                bus_write(visc->high_plane[SP], data);
-                visc->high_plane[SP]++;
-                visc->high_plane[PC] = instr.imm;
-                if (debug_log)
-                    printf("[VISC Debug] CALL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    data = visc->high_plane[PC];
+                    bus_write(visc->high_plane[SP], data);
+                    visc->high_plane[SP]++;
+                    visc->high_plane[PC] = instr.imm;
+                    if (debug_log)
+                        printf("[VISC Debug] CALL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
 
-                break;
+                    break;
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
+            case RET:
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->high_plane[SP]--;
+                    data = visc->high_plane[SP];
+                    bus_write(visc->high_plane[SP], 0);
+                    visc->high_plane[PC] = data;
+                    if (debug_log)
+                        printf("[VISC Debug] RET Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                    break;
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
             default:
                 printf("[VISC] \x1B[31mERROR\x1B[0m Unknown JUMP opcode \"%d\" at 0x%08X!\n", instr.opcode, visc->high_plane[PC]);
                 break;
@@ -656,13 +688,13 @@ void run_visc(VISC_I *visc, int clock_speed)
         }
         else if (al)
         {
-            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeld \"ALGORITHM_CLASS\" is unimpelemented, at 0x%08X\n", visc->high_plane[PC]);
+            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeled \"ALGORITHM_CLASS\" is unimplemented, at 0x%08X\n", visc->high_plane[PC]);
             shouldRun = false;
             return;
         }
         else if (f)
         {
-            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeld \"FLOAT_CLASS\" is unimpelemented, at 0x%08X\n", visc->high_plane[PC]);
+            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeled \"FLOAT_CLASS\" is unimplemented, at 0x%08X\n", visc->high_plane[PC]);
             shouldRun = false;
             return;
         }
