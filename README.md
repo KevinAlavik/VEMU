@@ -1,6 +1,6 @@
 # VEMU
 A VISC-I ISA emulator built in C. 
-<img width="1179" alt="image" src="https://github.com/KevinAlavik/VEMU/assets/95900603/ca3768db-27ef-434d-bfa4-bf69c5f6c4a7">
+<img width="1795" alt="image" src="https://github.com/KevinAlavik/VEMU/assets/95900603/87a80e7f-0aff-4094-b85b-03b9b358e9ea">
 *Example running roms/test.bin*
 
 ## Building
