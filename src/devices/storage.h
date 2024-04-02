@@ -10,7 +10,7 @@
 #define STORAGE_READ 0x01
 #define STORAGE_WRITE 0x02
 
-#define MAX_SECTORS 128
+#define MAX_SECTORS 16
 
 extern bool storageEnabled;
 

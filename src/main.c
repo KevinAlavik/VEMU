@@ -447,12 +447,15 @@ int main(int argc, char *argv[])
         }
         busEnable = false;
     }
-
     if (dumpd)
     {
-        busEnable = true;
-        hexdump(STORAGE_START, 0x200 * MAX_SECTORS);
-        busEnable = false;
+        for (int i = 0; i < MAX_SECTORS; i++)
+        {
+            printf("Sector %d:\n", i + 1);
+            busEnable = true;
+            hexdump(STORAGE_START + (0x200 * i), 0x200);
+            busEnable = false;
+        }
     }
 
     fclose(file);
