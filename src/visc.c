@@ -273,6 +273,23 @@ void run_visc(VISC_I *visc, int clock_speed)
     shouldRun = true;
     temp = visc;
 
+    // Reset once again after the init to make sure all registers are ready
+    visc->planeNum = 0;
+    switch_plane(visc, visc->planeNum);
+
+    for (int i = 0; i > PLANE_SIZE; i++)
+    {
+        visc->low_plane[i] = 0x00000000;
+    }
+
+    for (int i = 0; i > PLANE_SIZE; i++)
+    {
+        visc->high_plane[i] = 0x00000000;
+    }
+
+    visc->high_plane[SP] = DEFAULT_STACK_START;
+    visc->high_plane[BP] = DEFAULT_STACK_END;
+
     while (shouldRun)
     {
         int addr;
