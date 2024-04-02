@@ -12,6 +12,7 @@
 // Devices
 #include "devices/uart.h"
 #include "devices/syscon.h"
+#include "devices/storage.h"
 
 extern VISC_I *cpu;
 extern bool runEmu;

@@ -71,6 +71,38 @@ bool isnum(const char *str)
     return hasDigit;
 }
 
+void hexdump(uint32_t start, uint32_t size)
+{
+    for (uint32_t i = 0; i < size; i += 16)
+    {
+        printf("%08X: ", start + i);
+        for (int j = 0; j < 16; j++)
+        {
+            if (i + j < size)
+            {
+                uint32_t addr = start + i + j;
+                uint32_t v = bus_read(addr);
+                printf("%02X ", (unsigned int)v);
+            }
+            else
+            {
+                printf("   ");
+            }
+        }
+        printf(" ");
+        for (int j = 0; j < 16; j++)
+        {
+            if (i + j < size)
+            {
+                uint32_t addr = start + i + j;
+                uint32_t v = bus_read(addr);
+                printf("%c", (v >= 32 && v <= 126) ? (char)v : '.');
+            }
+        }
+        printf("\n");
+    }
+}
+
 // Option shit
 void list_extensions()
 {
@@ -85,7 +117,8 @@ void list_devices()
     printf("VEMU (%s) %s\n", __DATE__, VERSION_STR);
     printf("Devices:\n");
     printf("  - [%s] SYSCON:\t0x80000001\n", sysconEnabled ? "X" : " ");
-    printf("  - [%s] UART:\t0x80000003\n\n", uartEnabled ? "X" : " ");
+    printf("  - [%s] UART:\t0x80000002\n\n", uartEnabled ? "X" : " ");
+    printf("  - [%s] Storage:\t0x80000003\n\n", storageEnabled ? "X" : " ");
 }
 
 void usage(char *s)
@@ -100,6 +133,7 @@ void usage(char *s)
     printf("  -l,   --debug                                         enable debug logging in the emulator\n");
     printf("  -s,   --step                                          enable step mode\n");
     printf("  -r,   --dump-rom                                      dumps the memory region with the ROM\n");
+    printf("  -f,   --dump-floppy                                   dumps the memory region where the storage is\n");
     printf("  -ld,  --devices                                       lists all available devices\n");
     printf("  -mm,  --memory-map                                    outputs the memory map in a easy to read format\n");
     printf("  -le,  --list-extensions                               outputs all available extensions \n");
@@ -110,6 +144,7 @@ void usage(char *s)
     printf("  -se,  --syscon-enable                                 enable the builtin SYSCON device (enabled by default)\n");
     printf("  -rs,  --rom-size          [size]                      sets the ROM size (0xFF by default)\n");
     printf("  -c,   --clock-speed       [speed]                     sets the clock speed (10 by default. 0 for as fast as possible)\n");
+    printf("  -di,  --disk-image        [path]                      the disk image that the storage drive will load\n");
 }
 
 // Emulator entry
@@ -123,7 +158,9 @@ int main(int argc, char *argv[])
 
     char *filename = NULL;
     bool dumpm = false;
+    bool dumpd = false;
     bool info = false;
+    char *disk_img = NULL;
 
     cpu = init_visc();
 
@@ -158,6 +195,10 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--dump-rom") == 0)
         {
             dumpm = true;
+        }
+        else if (strcmp(argv[i], "-f") == 0 || strcmp(argv[i], "--dump-floppy") == 0)
+        {
+            dumpd = true;
         }
         else if (strcmp(argv[i], "-i") == 0 || strcmp(argv[i], "--info") == 0)
         {
@@ -293,6 +334,18 @@ int main(int argc, char *argv[])
                 printf("[VISC] \x1B[31mERROR\x1B[0m %s expected a argument. Usage %s %s [speed (Mhz)]\n", argv[i], argv[0], argv[i]);
             }
         }
+        else if (strcmp(argv[i], "-di") == 0 || strcmp(argv[i], "--disk-image") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                disk_img = argv[i + 1];
+            }
+            else
+            {
+
+                printf("[VISC] \x1B[31mERROR\x1B[0m %s expected a argument. Usage %s %s [disk image (path)]\n", argv[i], argv[0], argv[i]);
+            }
+        }
         else
         {
             if (argv[i][0] == '-' || (argv[i][0] == '-' && argv[i][1] == '-'))
@@ -305,6 +358,36 @@ int main(int argc, char *argv[])
                 filename = argv[i];
             }
         }
+    }
+
+    if (filename == NULL)
+    {
+        printf("[VISC] \x1B[31mERROR\x1B[0m No input file specified\n");
+        return EXIT_FAILURE;
+    }
+
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL)
+    {
+        perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM file");
+        return EXIT_FAILURE;
+    }
+
+    rom_init(ROM_START, rom_size, file);
+
+    if (disk_img != NULL)
+    {
+        FILE *disk_raw = fopen(disk_img, "rb");
+        if (disk_raw == NULL)
+        {
+            perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM file");
+            return EXIT_FAILURE;
+        }
+        storage_init(STORAGE_START, disk_raw);
+    }
+    else
+    {
+        printf("[VISC] \x1B[0;33mWARNING!\x1B[0m No storage device enabled.\n");
     }
 
     if (info)
@@ -331,24 +414,11 @@ int main(int argc, char *argv[])
         printf("  DEVICES:                               \n");
         printf("    - [%s] SYSCON                        \n", sysconEnabled ? "X" : " ");
         printf("    - [%s] UART                          \n", uartEnabled ? "X" : " ");
+        printf("    - [%s] Storage                       \n", storageEnabled ? "X" : " ");
         printf("                                         \n");
         printf("-----------------------------------------\n");
     }
 
-    if (filename == NULL)
-    {
-        printf("[VISC] \x1B[31mERROR\x1B[0m No input file specified\n");
-        return EXIT_FAILURE;
-    }
-
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL)
-    {
-        perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM file");
-        return EXIT_FAILURE;
-    }
-
-    rom_init(ROM_START, rom_size, file);
     while (runEmu)
     {
         run_visc(cpu, clock_speed);
@@ -375,6 +445,13 @@ int main(int argc, char *argv[])
             uint32_t v = bus_read(i);
             printf("0x%08X: 0x%08X\n", i, v);
         }
+        busEnable = false;
+    }
+
+    if (dumpd)
+    {
+        busEnable = true;
+        hexdump(STORAGE_START, 0x200 * MAX_SECTORS);
         busEnable = false;
     }
 

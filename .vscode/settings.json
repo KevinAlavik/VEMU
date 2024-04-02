@@ -1,12 +1,14 @@
 {
-    "files.associations": {
-        "stdio.h": "c",
-        "compare": "c",
-        "cstdint": "c",
-        "stdint.h": "c",
-        "visc.h": "c",
-        "bridge.h": "c",
-        "uart.h": "c",
-        "cstdlib": "c"
-    }
+  "files.associations": {
+    "stdio.h": "c",
+    "compare": "c",
+    "cstdint": "c",
+    "stdint.h": "c",
+    "visc.h": "c",
+    "bridge.h": "c",
+    "uart.h": "c",
+    "cstdlib": "c",
+    "string.h": "c",
+    "ram.h": "c"
+  }
 }
