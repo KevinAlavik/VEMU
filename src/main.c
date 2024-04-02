@@ -394,21 +394,24 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
     }
-    else
-    {
-        printf("[VISC] \x1B[0;33mWARNING!\x1B[0m No storage device enabled.\n");
-    }
 
     // Setup the ROM
     rom_init(ROM_START, rom_size, file);
 
     // Setup the storage device
-    storage_init(STORAGE_START, disk_raw);
+    if (disk_raw == NULL)
+    {
+        printf("[VISC] \x1B[0;33mWARNING!\x1B[0m No storage device enabled.\n");
+    }
+    else
+    {
+        storage_init(STORAGE_START, disk_raw);
 
-    cpu->low_plane[A1] = 0;
-    cpu->low_plane[A2] = MAX_SECTORS;
-    cpu->low_plane[A3] = DEFAULT_STACK_END + 1;
-    bus_write(STORAGE_START, STORAGE_READ);
+        cpu->low_plane[A1] = 0;
+        cpu->low_plane[A2] = MAX_SECTORS;
+        cpu->low_plane[A3] = DEFAULT_STACK_END + 1;
+        bus_write(STORAGE_START, STORAGE_READ);
+    }
 
     if (info)
     {
