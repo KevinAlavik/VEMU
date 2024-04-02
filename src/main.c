@@ -75,17 +75,19 @@ void hexdump(uint32_t start, uint32_t size)
     for (uint32_t i = 0; i < size; i += 16)
     {
         printf("%08X: ", start + i);
-        for (int j = 0; j < 16; j++)
+        for (int j = 0; j < 4; j++)
         {
-            if (i + j < size)
+            if (i + j * 4 < size)
             {
-                uint32_t addr = start + i + j;
+                uint32_t addr = start + i + j * 4;
+                busEnable = true;
                 uint32_t v = bus_read(addr);
-                printf("%02X ", (unsigned int)v);
+                busEnable = false;
+                printf("%08X ", v);
             }
             else
             {
-                printf("   ");
+                printf("         ");
             }
         }
         printf(" ");
@@ -94,7 +96,9 @@ void hexdump(uint32_t start, uint32_t size)
             if (i + j < size)
             {
                 uint32_t addr = start + i + j;
+                busEnable = true;
                 uint32_t v = bus_read(addr);
+                busEnable = false;
                 printf("%c", (v >= 32 && v <= 126) ? (char)v : '.');
             }
         }
@@ -132,7 +136,7 @@ void usage(char *s)
     printf("  -l,   --debug                                         enable debug logging in the emulator\n");
     printf("  -s,   --step                                          enable step mode\n");
     printf("  -r,   --dump-rom                                      dumps the memory region with the ROM\n");
-    printf("  -f,   --dump-floppy                                   dumps the memory region where the storage is\n");
+    printf("  -dd,  --dump-disk                                     dumps the memory region where the disk is located\n");
     printf("  -ld,  --devices                                       lists all available devices\n");
     printf("  -mm,  --memory-map                                    outputs the memory map in a easy to read format\n");
     printf("  -le,  --list-extensions                               outputs all available extensions \n");
@@ -144,6 +148,7 @@ void usage(char *s)
     printf("  -rs,  --rom-size          [size]                      sets the ROM size (0xFF by default)\n");
     printf("  -c,   --clock-speed       [speed]                     sets the clock speed (10 by default. 0 for as fast as possible)\n");
     printf("  -di,  --disk-image        [path]                      the disk image that the storage drive will load\n");
+    printf("  -ds,  --dump-stack                                    dumps the stack (from SP to BP)\n");
 }
 
 // Emulator entry
@@ -158,6 +163,9 @@ int main(int argc, char *argv[])
     char *filename = NULL;
     bool dumpm = false;
     bool dumpd = false;
+    bool stack_dump = false;
+    bool ld = false;
+    bool le = false;
     bool info = false;
     char *disk_img = NULL;
 
@@ -195,7 +203,7 @@ int main(int argc, char *argv[])
         {
             dumpm = true;
         }
-        else if (strcmp(argv[i], "-f") == 0 || strcmp(argv[i], "--dump-floppy") == 0)
+        else if (strcmp(argv[i], "-dd") == 0 || strcmp(argv[i], "--dump-disk") == 0)
         {
             dumpd = true;
         }
@@ -205,7 +213,7 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(argv[i], "-ld") == 0 || strcmp(argv[i], "--devices") == 0)
         {
-            list_devices();
+            ld = true;
             return 0;
         }
         else if (strcmp(argv[i], "-mm") == 0 || strcmp(argv[i], "--memory-map") == 0)
@@ -220,8 +228,7 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(argv[i], "-le") == 0 || strcmp(argv[i], "--list-extensions") == 0)
         {
-            list_extensions();
-            return 0;
+            le = true;
         }
         else if (strcmp(argv[i], "-e") == 0 || strcmp(argv[i], "--extensions") == 0)
         {
@@ -229,7 +236,7 @@ int main(int argc, char *argv[])
             {
                 if (strcmp(argv[i + 1], "list") == 0)
                 {
-                    list_extensions();
+                    le = true;
                 }
                 else if (strcmp(argv[i + 1], "enable") == 0)
                 {
@@ -345,6 +352,10 @@ int main(int argc, char *argv[])
                 printf("[VISC] \x1B[31mERROR\x1B[0m %s expected a argument. Usage %s %s [disk image (path)]\n", argv[i], argv[0], argv[i]);
             }
         }
+        else if (strcmp(argv[i], "-ds") == 0 || strcmp(argv[i], "--dump-stack") == 0)
+        {
+            stack_dump = true;
+        }
         else
         {
             if (argv[i][0] == '-' || (argv[i][0] == '-' && argv[i][1] == '-'))
@@ -372,22 +383,32 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    rom_init(ROM_START, rom_size, file);
+    FILE *disk_raw = NULL;
 
     if (disk_img != NULL)
     {
-        FILE *disk_raw = fopen(disk_img, "rb");
+        disk_raw = fopen(disk_img, "rb");
         if (disk_raw == NULL)
         {
-            perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM file");
+            perror("[VISC] \x1B[31mERROR\x1B[0m Error opening disk image");
             return EXIT_FAILURE;
         }
-        storage_init(STORAGE_START, disk_raw);
     }
     else
     {
         printf("[VISC] \x1B[0;33mWARNING!\x1B[0m No storage device enabled.\n");
     }
+
+    // Setup the ROM
+    rom_init(ROM_START, rom_size, file);
+
+    // Setup the storage device
+    storage_init(STORAGE_START, disk_raw);
+
+    cpu->low_plane[A1] = 0;
+    cpu->low_plane[A2] = MAX_SECTORS;
+    cpu->low_plane[A3] = DEFAULT_STACK_END + 1;
+    bus_write(STORAGE_START, STORAGE_READ);
 
     if (info)
     {
@@ -418,6 +439,18 @@ int main(int argc, char *argv[])
         printf("-----------------------------------------\n");
     }
 
+    if (ld)
+        list_devices();
+
+    if (le)
+        list_extensions();
+
+    // Hacky trick to clear stack
+    for (int i = DEFAULT_STACK_START; i < DEFAULT_STACK_END; i++)
+    {
+        bus_write(i, 0);
+    }
+
     while (runEmu)
     {
         run_visc(cpu, clock_speed);
@@ -425,15 +458,12 @@ int main(int argc, char *argv[])
         bus_write(SYSCON_START, SYSCON_SHUTDOWN);
     }
 
-    // force enable UART to dump becuz im lazy.
     if (dump)
     {
-        uartEnabled = true;
         busEnable = true;
         cpu->low_plane[A1] = 2; // Dump all pages
         bus_write(SYSCON_START, SYSCON_DUMP);
         busEnable = false;
-        uartEnabled = false;
     }
 
     if (dumpm)
@@ -448,19 +478,19 @@ int main(int argc, char *argv[])
     }
     if (dumpd)
     {
-        busEnable = true;
-
-        cpu->low_plane[A1] = 0;
-        cpu->low_plane[A2] = MAX_SECTORS;
-        cpu->low_plane[A3] = 0x00001000;
-        bus_write(STORAGE_START, STORAGE_READ);
+        if (!storageEnabled)
+            return 0;
 
         for (int i = 0; i < MAX_SECTORS; i++)
         {
             printf("Sector %d:\n", i + 1);
-            hexdump(0x0001000 + (0x200 * i), 0x200);
+            hexdump((DEFAULT_STACK_END + 1) + (0x200 * i), 0x200);
         }
-        busEnable = false;
+    }
+
+    if (stack_dump)
+    {
+        hexdump(cpu->high_plane[SP], cpu->high_plane[BP] - cpu->high_plane[SP]);
     }
 
     fclose(file);

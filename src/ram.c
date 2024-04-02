@@ -11,9 +11,9 @@ uint32_t ram_read(uint32_t addr)
         printf("[VISC] \x1B[31mERROR\x1B[0m Trying to go out of bounds in RAM!\n");
         return 0;
     }
-#ifdef DEBUG
-    printf("[VISC Debug] 0x%08X -> 0x%08X\n", addr, ram[addr - ram_base]);
-#endif
+    // if (debug_log)
+    //     printf("[VISC Debug] 0x%08X -> 0x%08X\n", addr, ram[addr - ram_base]);
+
     return ram[addr - ram_base];
 }
 

@@ -142,7 +142,8 @@ VISC_I *init_visc()
         cpu->high_plane[i] = 0x00000000;
     }
 
-    cpu->high_plane[SP] = 0x00000100;
+    cpu->high_plane[SP] = DEFAULT_STACK_START;
+    cpu->high_plane[BP] = DEFAULT_STACK_END;
 
     enable_extension(cpu, BASIC_SHIT);
     disable_extension(cpu, MULTIPLY); // Disable as default
@@ -280,10 +281,11 @@ void run_visc(VISC_I *visc, int clock_speed)
         addr = visc->high_plane[PC];
 
         // Avoid going out of bounds
-        if ((addr + 1) >= (ROM_START + rom_size))
+        // TODO: Fix issue where if you go past a certain point (0x0003EA6) it segfaults.
+        if ((addr + 1) >= (RAM_START + RAM_END))
         {
             if (debug_log)
-                printf("[VISC] Reached end of ROM \"0x%08X\"\n", (ROM_START + rom_size));
+                printf("[VISC] Reached end of RAM \"0x%08X\"\n", (ROM_START + RAM_END));
 
             shouldRun = false;
             return;
@@ -291,6 +293,7 @@ void run_visc(VISC_I *visc, int clock_speed)
 
         uint32_t val_low = bus_read(addr);
         uint32_t val_high = bus_read(addr + 1);
+        // printf("0x%08X: 0x%08X%08X\n", addr, val_low, val_high);
 
         Instruction instr = extract_instruction(val_low, val_high);
         bool d = false;
@@ -332,7 +335,8 @@ void run_visc(VISC_I *visc, int clock_speed)
             f = true;
             break;
         default:
-            printf("[VISC] \x1B[31mERROR\x1B[0m Unknown opcode class \"%d\"\n", instr.class);
+            printf("[VISC] \x1B[31mERROR\x1B[0m Unknown opcode class \"%d\" at 0x%08X\n", instr.class, visc->high_plane[PC]);
+            shouldRun = false;
             break;
         }
 
@@ -442,6 +446,11 @@ void run_visc(VISC_I *visc, int clock_speed)
             case PUSH:
                 if (extension_enabled(visc, BASIC_SHIT))
                 {
+                    if (visc->high_plane[SP] + 1 >= visc->high_plane[BP])
+                    {
+                        printf("[VISC] \x1B[31mERROR\x1B[0m Stack overflow at 0x%08X\n", visc->high_plane[PC]);
+                        shouldRun = false;
+                    }
                     data = visc->curPlane[instr.sr1];
                     bus_write(visc->high_plane[SP], data);
                     visc->high_plane[SP]++;
@@ -472,7 +481,7 @@ void run_visc(VISC_I *visc, int clock_speed)
                     shouldRun = false;
                 }
             default:
-                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown DATA opcode \"%d\"!\n", instr.opcode);
+                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown DATA opcode \"%d\" at 0x%08X!\n", instr.opcode, visc->high_plane[PC]);
                 break;
             }
         }
@@ -598,7 +607,7 @@ void run_visc(VISC_I *visc, int clock_speed)
                 }
                 break;
             default:
-                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown ALU opcode \"%d\"!\n", instr.opcode);
+                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown ALU opcode \"%d\" at 0x%08X!\n", instr.opcode, visc->high_plane[PC]);
                 break;
             }
         }
@@ -623,20 +632,20 @@ void run_visc(VISC_I *visc, int clock_speed)
 
                 break;
             default:
-                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown JUMP opcode \"%d\"!\n", instr.opcode);
+                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown JUMP opcode \"%d\" at 0x%08X!\n", instr.opcode, visc->high_plane[PC]);
                 break;
             };
             return;
         }
         else if (al)
         {
-            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeld \"ALGORITHM_CLASS\" is unimpelemented!\n");
+            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeld \"ALGORITHM_CLASS\" is unimpelemented, at 0x%08X\n", visc->high_plane[PC]);
             shouldRun = false;
             return;
         }
         else if (f)
         {
-            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeld \"FLOAT_CLASS\" is unimpelemented!\n");
+            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeld \"FLOAT_CLASS\" is unimpelemented, at 0x%08X\n", visc->high_plane[PC]);
             shouldRun = false;
             return;
         }

@@ -38,7 +38,7 @@ void bus_write(uint32_t addr, uint32_t data)
 {
     if (!busEnable)
         return;
-    for (int i = 0; i < num_devices; i++)
+    for (uint32_t i = 0; i < num_devices; i++)
     {
         if (addr >= devices[i].base && addr <= devices[i].limit && devices[i].write)
         {
@@ -53,7 +53,7 @@ uint32_t bus_read(uint32_t addr)
 {
     if (!busEnable)
         return -1;
-    for (int i = 0; i < num_devices; i++)
+    for (uint32_t i = 0; i < num_devices; i++)
     {
         if (addr >= devices[i].base && addr <= devices[i].limit && devices[i].read)
         {
