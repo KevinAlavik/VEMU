@@ -4,6 +4,7 @@ VISC_I *temp;
 bool shouldRun = true;
 bool debug_log = false;
 bool debug_step = false;
+int rom_size = ROM_END;
 
 struct Instruction
 {

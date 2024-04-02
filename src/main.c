@@ -7,7 +7,6 @@ int clock_speed = 10;
 VISC_I *cpu;
 bool runEmu = true;
 bool dump = false;
-int rom_size = ROM_END;
 
 // Utility functions
 double bytes_to_kb(unsigned long long bytes_value)
@@ -405,7 +404,7 @@ int main(int argc, char *argv[])
         printf("              %.0f\tMB                   \n", bytes_to_mb(0xFFFFFFFF));
         printf("              %.0f\t\tGB                 \n", bytes_to_gb(0xFFFFFFFF));
         printf("                                         \n");
-        printf("  ROM:        %dB                        \n", ROM_END - rom_size);
+        printf("  ROM:        %d\tB                      \n", rom_size - ROM_START);
         printf("                                         \n");
         printf("  EXTENSIONS:                            \n");
         printf("    - [%s] BASIC_SHIT                    \n", extension_enabled(cpu, BASIC_SHIT) ? "X" : " ");
@@ -449,13 +448,19 @@ int main(int argc, char *argv[])
     }
     if (dumpd)
     {
+        busEnable = true;
+
+        cpu->low_plane[A1] = 0;
+        cpu->low_plane[A2] = MAX_SECTORS;
+        cpu->low_plane[A3] = 0x00001000;
+        bus_write(STORAGE_START, STORAGE_READ);
+
         for (int i = 0; i < MAX_SECTORS; i++)
         {
             printf("Sector %d:\n", i + 1);
-            busEnable = true;
-            hexdump(STORAGE_START + (0x200 * i), 0x200);
-            busEnable = false;
+            hexdump(0x0001000 + (0x200 * i), 0x200);
         }
+        busEnable = false;
     }
 
     fclose(file);
