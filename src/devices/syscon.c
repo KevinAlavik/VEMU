@@ -18,16 +18,8 @@ void syscon_write(uint32_t addr, uint32_t data)
         if (debug_log)
             printf("[VISC - Syscon] Triggered SHUTDOWN!\n");
         shouldRun = false;
-        runEmu = false; // Make sure to kill the emulator too
-        // Dump all registers if we want
-        if (dump)
-        {
-            cpu->low_plane[A1] = LPLANE;
-            bus_write(SYSCON_START, SYSCON_DUMP);
-            cpu->low_plane[A1] = HPLANE;
-            bus_write(SYSCON_START, SYSCON_DUMP);
-        }
-        busEnable = false; // Disable any bus actions
+        runEmu = false;
+        busEnable = false;
         break;
     case SYSCON_RESET:
         if (debug_log)
@@ -89,6 +81,43 @@ void syscon_write(uint32_t addr, uint32_t data)
             uart_print("HARTID: 0x%08X\n", cpu->curPlane[HARTID]);
             uart_print("FLAGS: 0x%08X\n", cpu->curPlane[FLAGS]);
         }
+        else if (cpu->low_plane[A1] == 2)
+        {
+            switch_plane(cpu, 0);
+            uart_print("A: 0x%08X\n", cpu->curPlane[A]);
+            uart_print("B: 0x%08X\n", cpu->curPlane[B]);
+            uart_print("C: 0x%08X\n", cpu->curPlane[C]);
+            uart_print("D: 0x%08X\n", cpu->curPlane[D]);
+            uart_print("E: 0x%08X\n", cpu->curPlane[E]);
+            uart_print("F: 0x%08X\n", cpu->curPlane[F]);
+            uart_print("G: 0x%08X\n", cpu->curPlane[G]);
+            uart_print("H: 0x%08X\n", cpu->curPlane[H]);
+            uart_print("A1: 0x%08X\n", cpu->curPlane[A1]);
+            uart_print("A2: 0x%08X\n", cpu->curPlane[A2]);
+            uart_print("A3: 0x%08X\n", cpu->curPlane[A3]);
+            uart_print("A4: 0x%08X\n", cpu->curPlane[A4]);
+            uart_print("A5: 0x%08X\n", cpu->curPlane[A5]);
+            uart_print("A6: 0x%08X\n", cpu->curPlane[A6]);
+            uart_print("A7: 0x%08X\n", cpu->curPlane[A7]);
+            uart_print("A8: 0x%08X\n", cpu->curPlane[A8]);
+            switch_plane(cpu, 1);
+            uart_print("A_SHADOW: 0x%08X\n", cpu->curPlane[A_SHADOW]);
+            uart_print("B_SHADOW: 0x%08X\n", cpu->curPlane[B_SHADOW]);
+            uart_print("C_SHADOW: 0x%08X\n", cpu->curPlane[C_SHADOW]);
+            uart_print("D_SHADOW: 0x%08X\n", cpu->curPlane[D_SHADOW]);
+            uart_print("E_SHADOW: 0x%08X\n", cpu->curPlane[E_SHADOW]);
+            uart_print("F_SHADOW: 0x%08X\n", cpu->curPlane[F_SHADOW]);
+            uart_print("G_SHADOW: 0x%08X\n", cpu->curPlane[G_SHADOW]);
+            uart_print("H_SHADOW: 0x%08X\n", cpu->curPlane[H_SHADOW]);
+            uart_print("PC: 0x%08X\n", cpu->curPlane[PC]);
+            uart_print("SP: 0x%08X\n", cpu->curPlane[SP]);
+            uart_print("BP: 0x%08X\n", cpu->curPlane[BP]);
+            uart_print("RESERVED: 0x%08X\n", cpu->curPlane[RESERVED_1]);
+            uart_print("RESERVED: 0x%08X\n", cpu->curPlane[RESERVED_2]);
+            uart_print("STATUS: 0x%08X\n", cpu->curPlane[STATUS]);
+            uart_print("HARTID: 0x%08X\n", cpu->curPlane[HARTID]);
+            uart_print("FLAGS: 0x%08X\n", cpu->curPlane[FLAGS]);
+        }
         else
         {
             printf("[VISC - Syscon] Invalid command \"%d\"", cpu->low_plane[A1]);
@@ -101,8 +130,8 @@ void syscon_write(uint32_t addr, uint32_t data)
     }
 }
 
-void syscon_init(uint32_t base, uint32_t size)
+void syscon_init(uint32_t base)
 {
     syscon_base = base;
-    add_device(base, size, syscon_read, syscon_write);
+    add_device(base, base, syscon_read, syscon_write);
 }

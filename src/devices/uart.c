@@ -44,8 +44,8 @@ void uart_write(uint32_t addr, uint32_t data)
     }
 }
 
-void uart_init(uint32_t base, uint32_t size)
+void uart_init(uint32_t base)
 {
     uart_base = base;
-    add_device(base, size, uart_read, uart_write);
+    add_device(base, base, uart_read, uart_write);
 }
