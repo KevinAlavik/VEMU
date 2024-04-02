@@ -3,6 +3,7 @@
 #include <stdarg.h>
 
 uint32_t uart_base;
+bool uartEnabled = false;
 
 uint32_t uart_read(uint32_t addr)
 {
@@ -12,6 +13,9 @@ uint32_t uart_read(uint32_t addr)
 
 void uart_print(const char *fmt, ...)
 {
+    if (!uartEnabled)
+        return;
+
     va_list args;
     va_start(args, fmt);
     char output[512];
@@ -29,6 +33,9 @@ void uart_print(const char *fmt, ...)
 
 void uart_write(uint32_t addr, uint32_t data)
 {
+    if (!uartEnabled)
+        return;
+
     switch (data)
     {
     case UART_WRITE:
@@ -48,4 +55,5 @@ void uart_init(uint32_t base)
 {
     uart_base = base;
     add_device(base, base, uart_read, uart_write);
+    uartEnabled = true;
 }

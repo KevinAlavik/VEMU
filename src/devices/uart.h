@@ -10,6 +10,8 @@
 #define UART_WRITE 0x01
 #define UART_CLEAR 0x02
 
+extern bool uartEnabled;
+
 void uart_init(uint32_t base);
 void uart_print(const char *fmt, ...);
 

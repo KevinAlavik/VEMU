@@ -11,6 +11,8 @@
 #define SYSCON_RESET 0x02
 #define SYSCON_DUMP 0x03
 
+extern bool sysconEnabled;
+
 void syscon_init(uint32_t base);
 
 #endif // __SYSCON_H__

@@ -260,6 +260,8 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
 // Emulate a delay in Mhz
 void delay_mhz(unsigned int frequency_mhz)
 {
+    if (frequency_mhz <= 0)
+        return;
     unsigned int delay_microseconds = 1000000 / (frequency_mhz * 10);
     usleep(delay_microseconds);
 }
@@ -277,10 +279,10 @@ void run_visc(VISC_I *visc, int clock_speed)
         addr = visc->high_plane[PC];
 
         // Avoid going out of bounds
-        if ((addr + 1) >= (ROM_START + ROM_END))
+        if ((addr + 1) >= (ROM_START + rom_size))
         {
             if (debug_log)
-                printf("[VISC] Reached end of ROM \"0x%08X\"\n", (ROM_START + ROM_END));
+                printf("[VISC] Reached end of ROM \"0x%08X\"\n", (ROM_START + rom_size));
 
             shouldRun = false;
             return;
@@ -525,6 +527,23 @@ void run_visc(VISC_I *visc, int clock_speed)
         visc->high_plane[PC] += 2;
         if (debug_step)
         {
+            printf("A: 0x%08X B: 0x%08X C: 0x%08X D: 0x%08X E: 0x%08X F: 0x%08X G: 0x%08X H: 0x%08X A1: 0x%08X A2: 0x%08X A3: 0x%08X A4: 0x%08X A5: 0x%08X A6: 0x%08X A7: 0x%08X A8: 0x%08X",
+                   visc->low_plane[A],
+                   visc->low_plane[B],
+                   visc->low_plane[C],
+                   visc->low_plane[D],
+                   visc->low_plane[E],
+                   visc->low_plane[F],
+                   visc->low_plane[G],
+                   visc->low_plane[H],
+                   visc->low_plane[A1],
+                   visc->low_plane[A2],
+                   visc->low_plane[A3],
+                   visc->low_plane[A4],
+                   visc->low_plane[A5],
+                   visc->low_plane[A6],
+                   visc->low_plane[A7],
+                   visc->low_plane[A8]);
             char c;
             scanf("%c", &c);
         }

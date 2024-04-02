@@ -2,11 +2,12 @@
 #include <string.h>
 
 #define VERSION_STR "v0.1.4"
-#define CLOCK_SPEED 10
+int clock_speed = 10;
 
 VISC_I *cpu;
 bool runEmu = true;
 bool dump = false;
+int rom_size = ROM_END;
 
 // Utility functions
 double bytes_to_kb(unsigned long long bytes_value)
@@ -83,8 +84,8 @@ void list_devices()
 {
     printf("VEMU (%s) %s\n", __DATE__, VERSION_STR);
     printf("Devices:\n");
-    printf("  - [%s] SYSCON:\t0x80000001\n", busEnable ? "X" : " ");
-    printf("  - [%s] UART:\t0x80000003\n\n", busEnable ? "X" : " ");
+    printf("  - [%s] SYSCON:\t0x80000001\n", sysconEnabled ? "X" : " ");
+    printf("  - [%s] UART:\t0x80000003\n\n", uartEnabled ? "X" : " ");
 }
 
 void usage(char *s)
@@ -92,17 +93,23 @@ void usage(char *s)
     printf("Usage: %s [OPTION]... [FILE]\n", s);
     printf("Emulate a VISC-I ISA CPU.\n\n");
     printf("Options:\n");
-    printf("  -h,  --help                display this help and exit\n");
-    printf("  -v,  --version             output version information and exit\n");
-    printf("  -i,  --info                outputs the info box\n");
-    printf("  -d,  --dump                dumps the register on shutdown\n");
-    printf("  -l,  --debug               enable debug logging in the emulator\n");
-    printf("  -s,  --step                enable step mode");
-    printf("  -r,  --dump-rom            dumps the memory region with the ROM\n");
-    printf("  -ld, --devices             lists all available devices\n");
-    printf("  -mm, --memory-map          outputs the memory map in a easy to read format\n");
-    printf("  -le, --list-extensions     outputs all available extensions \n");
-    printf("  -e,  --extensions          manage extensions (enable, disable, list)\n");
+    printf("  -h,   --help                display this help and exit\n");
+    printf("  -v,   --version             output version information and exit\n");
+    printf("  -i,   --info                outputs the info box\n");
+    printf("  -d,   --dump                dumps the register on shutdown\n");
+    printf("  -l,   --debug               enable debug logging in the emulator\n");
+    printf("  -s,   --step                enable step mode\n");
+    printf("  -r,   --dump-rom            dumps the memory region with the ROM\n");
+    printf("  -ld,  --devices             lists all available devices\n");
+    printf("  -mm,  --memory-map          outputs the memory map in a easy to read format\n");
+    printf("  -le,  --list-extensions     outputs all available extensions \n");
+    printf("  -e,   --extensions          manage extensions (enable, disable, list)\n");
+    printf("  -ud,  --uart-disable        disable the builtin UART device\n");
+    printf("  -ue,  --uart-enable         enable the builtin UART device (enabled by default)\n");
+    printf("  -sd,  --syscon-disable      disable the builtin SYSCON device\n");
+    printf("  -se,  --syscon-enable       enable the builtin SYSCON device (enabled by default)\n");
+    printf("  -rs,  --rom-size            sets the ROM size (0xFF by default)\n");
+    printf("  -c,   --clock-speed         sets the clock speed (10 by default. 0 for as fast as possible)\n");
 }
 
 // Emulator entry
@@ -119,6 +126,10 @@ int main(int argc, char *argv[])
     bool info = false;
 
     cpu = init_visc();
+
+    ram_init(RAM_START, RAM_END);
+    syscon_init(SYSCON_START);
+    uart_init(UART_START);
 
     for (int i = 1; i < argc; i++)
     {
@@ -202,11 +213,19 @@ int main(int argc, char *argv[])
                 {
                     if (i + 2 < argc)
                     {
+                        printf("[VISC] \x1B[0;33mWARNING!\x1B[0m Disabling some of the CPU extensions may cause unexpected/broken behaviour!\n");
                         int id;
                         if (isnum(argv[i + 2]))
                             id = atoi(argv[i + 2]);
                         else
                             id = get_extension_id(argv[i + 2]);
+
+                        if (id == BASIC_SHIT)
+                            printf("[VISC] \x1B[0;33mWARNING!\x1B[0m Disabling the \"BASIC_SHIT\" (%d) extension. Will make CPU useless. It will disable all basic instructions (LD, ST, PUSH, POP, etc.)!\n", id);
+
+                        if (id == MULTIPLY)
+                            printf("[VISC] \x1B[0;33mWARNING!\x1B[0m Disabling the \"MULTIPLY\" (%d) extension. Will disable the MUL and DIV instructions!\n", id);
+
                         disable_extension(cpu, id);
                         i++;
                     }
@@ -229,6 +248,49 @@ int main(int argc, char *argv[])
                 printf("  - disable     [id / name]\n");
                 printf("  - list            \n");
                 return EXIT_FAILURE;
+            }
+        }
+        else if (strcmp(argv[i], "-ud") == 0 || strcmp(argv[i], "--uart-disable") == 0)
+        {
+            printf("[VISC] \x1B[0;33mWARNING!\x1B[0m Disabling the UART makes the CPU unable to print out text via the emulator!\n");
+            uartEnabled = false;
+        }
+        else if (strcmp(argv[i], "-ue") == 0 || strcmp(argv[i], "--uart-enable") == 0)
+        {
+            uartEnabled = true;
+        }
+        else if (strcmp(argv[i], "-sd") == 0 || strcmp(argv[i], "--syscon-disable") == 0)
+        {
+            printf("[VISC] \x1B[0;33mWARNING!\x1B[0m Disabling the SYSCON makes the CPU unable to reive shutdown/reset/dump interrupts!\n");
+            sysconEnabled = false;
+        }
+        else if (strcmp(argv[i], "-se") == 0 || strcmp(argv[i], "--syscon-enable") == 0)
+        {
+            sysconEnabled = true;
+        }
+        else if (strcmp(argv[i], "-rs") == 0 || strcmp(argv[i], "--rom-size") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                printf("[VISC] \x1B[0;33mWARNING!\x1B[0m Setting ROM size may cause issue since the other devices does'nt dynamicly get there size. So if you go over 0xFF (256) it might override ROM (or init stack since thats first)!\n");
+                rom_size = atoi(argv[i + i]);
+            }
+            else
+            {
+
+                printf("%s expected a argument. Usage %s %s [size]\n", argv[i], argv[0], argv[i]);
+            }
+        }
+        else if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--clock-speed") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                clock_speed = atoi(argv[i + 1]);
+            }
+            else
+            {
+
+                printf("%s expected a argument. Usage %s %s [speed (Mhz)]\n", argv[i], argv[0], argv[i]);
             }
         }
         else
@@ -258,6 +320,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    rom_init(ROM_START, rom_size, file);
+
     if (info)
     {
         printf("-----------------------------------------\n");
@@ -281,21 +345,15 @@ int main(int argc, char *argv[])
         printf("    - [%s] MULTIPLY                      \n", extension_enabled(cpu, MULTIPLY) ? "X" : " ");
         printf("                                         \n");
         printf("  DEVICES:                               \n");
-        printf("    - [%s] SYSCON                        \n", busEnable ? "X" : " ");
-        printf("    - [%s] UART                          \n", busEnable ? "X" : " ");
+        printf("    - [%s] SYSCON                        \n", sysconEnabled ? "X" : " ");
+        printf("    - [%s] UART                          \n", uartEnabled ? "X" : " ");
         printf("                                         \n");
         printf("-----------------------------------------\n");
     }
 
-    rom_init(ROM_START, ROM_END, file);
-    ram_init(RAM_START, RAM_END);
-
-    syscon_init(SYSCON_START);
-    uart_init(UART_START);
-
     while (runEmu)
     {
-        run_visc(cpu, CLOCK_SPEED);
+        run_visc(cpu, clock_speed);
         bus_write(SYSCON_START, SYSCON_SHUTDOWN);
     }
 

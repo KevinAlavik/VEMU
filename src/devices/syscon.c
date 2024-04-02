@@ -3,6 +3,7 @@
 #include "../visc.h"
 
 uint32_t syscon_base;
+bool sysconEnabled = false;
 
 uint32_t syscon_read(uint32_t addr)
 {
@@ -12,6 +13,9 @@ uint32_t syscon_read(uint32_t addr)
 
 void syscon_write(uint32_t addr, uint32_t data)
 {
+    if (!sysconEnabled)
+        return;
+
     switch (data)
     {
     case SYSCON_SHUTDOWN:
@@ -39,6 +43,11 @@ void syscon_write(uint32_t addr, uint32_t data)
         cpu->high_plane[SP] = 0x00000100;
         break;
     case SYSCON_DUMP:
+        if (!uartEnabled)
+        {
+            printf("[VISC] SYSCON DUMP Needs a UART device connected to 01!\n");
+            return;
+        }
         if (debug_log)
             printf("[VISC - Syscon] Triggered DUMP!\n");
         if (cpu->low_plane[A1] == 0)
@@ -134,4 +143,5 @@ void syscon_init(uint32_t base)
 {
     syscon_base = base;
     add_device(base, base, syscon_read, syscon_write);
+    sysconEnabled = true;
 }
