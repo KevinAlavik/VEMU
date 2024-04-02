@@ -45,7 +45,7 @@ void syscon_write(uint32_t addr, uint32_t data)
     case SYSCON_DUMP:
         if (!uartEnabled)
         {
-            printf("[VISC] SYSCON DUMP Needs a UART device connected to 01!\n");
+            printf("[VISC] \x1B[31mERROR\x1B[0m SYSCON DUMP Needs a UART device connected to 01!\n");
             return;
         }
         if (debug_log)
@@ -129,12 +129,12 @@ void syscon_write(uint32_t addr, uint32_t data)
         }
         else
         {
-            printf("[VISC - Syscon] Invalid command \"%d\"", cpu->low_plane[A1]);
+            printf("[VISC SYSCON] \x1B[31mERROR\x1B[0m Invalid command \"%d\"", cpu->low_plane[A1]);
             exit(EXIT_FAILURE);
         }
         break;
     default:
-        printf("[VISC - Syscon] Unknown command \"%d\"", data);
+        printf("[VISC SYSCON] \x1B[31mERROR\x1B[0m Unknown command \"%d\"", data);
         break;
     }
 }

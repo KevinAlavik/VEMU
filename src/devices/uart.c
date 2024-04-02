@@ -46,7 +46,7 @@ void uart_write(uint32_t addr, uint32_t data)
         printf("\033[H");
         break;
     default:
-        printf("[VISC - UART] Unknown command \"%d\"", data);
+        printf("[VISC UART] \x1B[31mERROR\x1B[0m  Unknown command \"%d\"", data);
         break;
     }
 }

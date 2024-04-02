@@ -20,7 +20,7 @@ bool add_device(uint32_t base, uint32_t limit, BusReadFunc read,
         return false;
     if (num_devices >= MAX_DEVICES)
     {
-        printf("[VISC Debug] Maximum number of devices reached\n");
+        printf("[VISC] \x1B[31mERROR\x1B[0m Maximum number of devices reached\n");
         return false;
     }
     devices[num_devices].base = base;
@@ -46,7 +46,7 @@ void bus_write(uint32_t addr, uint32_t data)
             return;
         }
     }
-    printf("[VISC Debug] Write address %u out of range or no write function provided\n", addr);
+    printf("[VISC] \x1B[31mERROR\x1B[0m Write address %u out of range or no write function provided\n", addr);
 }
 
 uint32_t bus_read(uint32_t addr)
@@ -60,6 +60,6 @@ uint32_t bus_read(uint32_t addr)
             return devices[i].read(addr);
         }
     }
-    printf("[VISC Debug] Read address %u out of range or no read function provided\n", addr);
+    printf("[VISC] \x1B[31mERROR\x1B[0m  Read address %u out of range or no read function provided\n", addr);
     return 0;
 }

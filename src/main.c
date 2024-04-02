@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        printf("Error: Missing argument for 'enable'\n");
+                        printf("[VISC] \x1B[31mERROR\x1B[0m Missing argument for 'enable'\n");
                         return EXIT_FAILURE;
                     }
                 }
@@ -231,19 +231,19 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        printf("Error: Missing argument for 'disable'\n");
+                        printf("[VISC] \x1B[31mERROR\x1B[0m Missing argument for 'disable'\n");
                         return EXIT_FAILURE;
                     }
                 }
                 else
                 {
-                    printf("Error: Unknown subcommand for '%s' got '%s'\n", argv[i], argv[i + 1]);
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Unknown subcommand for '%s' got '%s'\n", argv[i], argv[i + 1]);
                     return EXIT_FAILURE;
                 }
             }
             else
             {
-                printf("Error: Missing subcommand for '%s'. Available subcommands:\n", argv[i]);
+                printf("[VISC] \x1B[31mERROR\x1B[0m Missing subcommand for '%s'. Available subcommands:\n", argv[i]);
                 printf("  - enable      [id / name]\n");
                 printf("  - disable     [id / name]\n");
                 printf("  - list            \n");
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
             else
             {
 
-                printf("%s expected a argument. Usage %s %s [size]\n", argv[i], argv[0], argv[i]);
+                printf("[VISC] \x1B[31mERROR\x1B[0m %s expected a argument. Usage %s %s [size]\n", argv[i], argv[0], argv[i]);
             }
         }
         else if (strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--clock-speed") == 0)
@@ -290,14 +290,14 @@ int main(int argc, char *argv[])
             else
             {
 
-                printf("%s expected a argument. Usage %s %s [speed (Mhz)]\n", argv[i], argv[0], argv[i]);
+                printf("[VISC] \x1B[31mERROR\x1B[0m %s expected a argument. Usage %s %s [speed (Mhz)]\n", argv[i], argv[0], argv[i]);
             }
         }
         else
         {
             if (argv[i][0] == '-' || (argv[i][0] == '-' && argv[i][1] == '-'))
             {
-                printf("Invalid option \"%s\"\n", argv[i]);
+                printf("[VISC] \x1B[31mERROR\x1B[0m Invalid option \"%s\"\n", argv[i]);
                 return EXIT_FAILURE;
             }
             else
@@ -309,14 +309,14 @@ int main(int argc, char *argv[])
 
     if (filename == NULL)
     {
-        printf("No input file specified\n");
+        printf("[VISC] \x1B[31mERROR\x1B[0m No input file specified\n");
         return EXIT_FAILURE;
     }
 
     FILE *file = fopen(filename, "rb");
     if (file == NULL)
     {
-        perror("Error opening ROM file");
+        perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM file");
         return EXIT_FAILURE;
     }
 

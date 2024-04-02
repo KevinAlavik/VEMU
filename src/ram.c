@@ -8,7 +8,7 @@ uint32_t ram_read(uint32_t addr)
 {
     if (addr >= RAM_END)
     {
-        printf("[VISC] Trying to go out of bounds in RAM!\n");
+        printf("[VISC] \x1B[31mERROR\x1B[0m Trying to go out of bounds in RAM!\n");
         return 0;
     }
 #ifdef DEBUG

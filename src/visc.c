@@ -331,100 +331,179 @@ void run_visc(VISC_I *visc, int clock_speed)
             f = true;
             break;
         default:
-            printf("[VISC] Unknown opcode class \"%d\"\n", instr.class);
+            printf("[VISC] \x1B[31mERROR\x1B[0m Unknown opcode class \"%d\"\n", instr.class);
             break;
         }
 
-        if (d && extension_enabled(visc, BASIC_SHIT))
+        if (d)
         {
             switch (instr.opcode)
             {
             case NOP:
-                if (debug_log)
-                    printf("[VISC Debug] NOP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    if (debug_log)
+                        printf("[VISC Debug] NOP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case LD:
-                data = (uint32_t)instr.imm;
-                visc->curPlane[instr.dr] = bus_read(data);
-                if (debug_log)
-                    printf("[VISC Debug] LD Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    data = (uint32_t)instr.imm;
+                    visc->curPlane[instr.dr] = bus_read(data);
+                    if (debug_log)
+                        printf("[VISC Debug] LD Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case ST:
-                data = (uint32_t)instr.imm;
-                bus_write(data, visc->curPlane[instr.sr1]);
-                if (debug_log)
-                    printf("[VISC Debug] ST Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    data = (uint32_t)instr.imm;
+                    bus_write(data, visc->curPlane[instr.sr1]);
+                    if (debug_log)
+                        printf("[VISC Debug] ST Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case LDI:
-                data = (uint32_t)instr.imm;
-                visc->curPlane[instr.dr] = data;
-                if (debug_log)
-                    printf("[VISC Debug] LDI Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    data = (uint32_t)instr.imm;
+                    visc->curPlane[instr.dr] = data;
+                    if (debug_log)
+                        printf("[VISC Debug] LDI Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case LDP:
-                data = visc->curPlane[instr.sr1];
-                data = bus_read(data);
-                visc->curPlane[instr.dr] = data;
-                if (debug_log)
-                    printf("[VISC Debug] LDP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    data = visc->curPlane[instr.sr1];
+                    data = bus_read(data);
+                    visc->curPlane[instr.dr] = data;
+                    if (debug_log)
+                        printf("[VISC Debug] LDP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case STP:
-                data = visc->curPlane[instr.sr2];
-                uint32_t val = bus_read(data);
-                data = visc->curPlane[instr.sr1];
-                bus_write(data, val);
-                if (debug_log)
-                    printf("[VISC Debug] STP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    data = visc->curPlane[instr.sr2];
+                    uint32_t val = bus_read(data);
+                    data = visc->curPlane[instr.sr1];
+                    bus_write(data, val);
+                    if (debug_log)
+                        printf("[VISC Debug] STP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case SRP:
-                data = (uint32_t)instr.imm;
-                switch_plane(visc, (uint8_t)data);
-                if (debug_log)
-                    printf("[VISC Debug] SRP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    data = (uint32_t)instr.imm;
+                    switch_plane(visc, (uint8_t)data);
+                    if (debug_log)
+                        printf("[VISC Debug] SRP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case PUSH:
-                data = visc->curPlane[instr.sr1];
-                bus_write(visc->high_plane[SP], data);
-                visc->high_plane[SP]++;
-                if (debug_log)
-                    printf("[VISC Debug] PUSH Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    data = visc->curPlane[instr.sr1];
+                    bus_write(visc->high_plane[SP], data);
+                    visc->high_plane[SP]++;
+                    if (debug_log)
+                        printf("[VISC Debug] PUSH Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case POP:
-                visc->high_plane[SP]--;
-                visc->curPlane[instr.sr1] = bus_read(visc->high_plane[SP]);
-                bus_write(visc->high_plane[SP], 0);
-                if (debug_log)
-                    printf("[VISC Debug] POP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
 
-                break;
+                    visc->high_plane[SP]--;
+                    visc->curPlane[instr.sr1] = bus_read(visc->high_plane[SP]);
+                    bus_write(visc->high_plane[SP], 0);
+                    if (debug_log)
+                        printf("[VISC Debug] POP Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+
+                    break;
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
             default:
-                printf("[VISC] Unknown DATA opcode \"%d\"!\n", instr.opcode);
+                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown DATA opcode \"%d\"!\n", instr.opcode);
                 break;
             }
         }
-        else if (a && extension_enabled(visc, BASIC_SHIT))
+        else if (a)
         {
             switch (instr.opcode)
             {
             case ADD:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] + visc->curPlane[instr.sr2];
-                if (debug_log)
-                    printf("[VISC Debug] ADD Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] + visc->curPlane[instr.sr2];
+                    if (debug_log)
+                        printf("[VISC Debug] ADD Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case SUB:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] - visc->curPlane[instr.sr2];
-                if (debug_log)
-                    printf("[VISC Debug] SUB Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] - visc->curPlane[instr.sr2];
+                    if (debug_log)
+                        printf("[VISC Debug] SUB Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case MUL:
                 if (extension_enabled(visc, MULTIPLY))
@@ -435,7 +514,8 @@ void run_visc(VISC_I *visc, int clock_speed)
                 }
                 else
                 {
-                    printf("[VISC] A MUL instruction tried to be executed at 0x%08X. Need to enable MULTIPLY!\n", visc->high_plane[PC]);
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
                 }
                 break;
             case DIV:
@@ -447,41 +527,77 @@ void run_visc(VISC_I *visc, int clock_speed)
                 }
                 else
                 {
-                    printf("[VISC] A DIV instruction tried to be executed at 0x%08X. Need to enable MULTIPLY!\n", visc->high_plane[PC]);
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
                 }
                 break;
             case SHL:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] << visc->curPlane[instr.sr2];
-                if (debug_log)
-                    printf("[VISC Debug] SHL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] << visc->curPlane[instr.sr2];
+                    if (debug_log)
+                        printf("[VISC Debug] SHL Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case SHR:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] >> visc->curPlane[instr.sr2];
-                if (debug_log)
-                    printf("[VISC Debug] SHR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] >> visc->curPlane[instr.sr2];
+                    if (debug_log)
+                        printf("[VISC Debug] SHR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case AND:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] & visc->curPlane[instr.sr2];
-                if (debug_log)
-                    printf("[VISC Debug] AND Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] & visc->curPlane[instr.sr2];
+                    if (debug_log)
+                        printf("[VISC Debug] AND Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case OR:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] | visc->curPlane[instr.sr2];
-                if (debug_log)
-                    printf("[VISC Debug] OR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] | visc->curPlane[instr.sr2];
+                    if (debug_log)
+                        printf("[VISC Debug] OR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             case XOR:
-                visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] ^ visc->curPlane[instr.sr2];
-                if (debug_log)
-                    printf("[VISC Debug] XOR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
-
+                if (extension_enabled(visc, BASIC_SHIT))
+                {
+                    visc->curPlane[instr.dr] = visc->curPlane[instr.sr1] ^ visc->curPlane[instr.sr2];
+                    if (debug_log)
+                        printf("[VISC Debug] XOR Instruction executed at 0x%08X\n", visc->high_plane[PC]);
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Illegal instruction at \"0x%08X\" (%d:%d)\n", visc->high_plane[PC], instr.class, instr.opcode);
+                    shouldRun = false;
+                }
                 break;
             default:
-                printf("[VISC] Unknown ALU opcode \"%d\"!\n", instr.opcode);
+                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown ALU opcode \"%d\"!\n", instr.opcode);
                 break;
             }
         }
@@ -506,20 +622,20 @@ void run_visc(VISC_I *visc, int clock_speed)
 
                 break;
             default:
-                printf("[VISC] Unknown JUMP opcode \"%d\"!\n", instr.opcode);
+                printf("[VISC] \x1B[31mERROR\x1B[0m Unknown JUMP opcode \"%d\"!\n", instr.opcode);
                 break;
             };
             return;
         }
         else if (al)
         {
-            printf("[VISC] The opcode class labeld \"ALGORITHM_CLASS\" is unimpelemented!\n");
+            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeld \"ALGORITHM_CLASS\" is unimpelemented!\n");
             shouldRun = false;
             return;
         }
         else if (f)
         {
-            printf("[VISC] The opcode class labeld \"FLOAT_CLASS\" is unimpelemented!\n");
+            printf("[VISC] \x1B[31mERROR\x1B[0m The opcode class labeld \"FLOAT_CLASS\" is unimpelemented!\n");
             shouldRun = false;
             return;
         }

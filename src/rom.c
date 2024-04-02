@@ -6,14 +6,14 @@ uint32_t rom_base;
 
 uint32_t rom_read(uint32_t addr)
 {
-    if (addr >= ROM_END)
+    if (addr >= rom_size)
     {
         printf("[VISC] Trying to go out of bounds in ROM!\n");
         return 0;
     }
-    #ifdef DEBUG
-        printf("[VISC Debug] 0x%08X -> 0x%08X\n", addr, rom[addr - rom_base]);
-    #endif
+#ifdef DEBUG
+    printf("[VISC Debug] 0x%08X -> 0x%08X\n", addr, rom[addr - rom_base]);
+#endif
     return rom[addr - rom_base];
 }
 
