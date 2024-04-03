@@ -31,7 +31,7 @@ void ram_write(uint32_t addr, uint32_t data)
 
 void ram_init(uint32_t base, uint32_t size)
 {
-    ram = (uint32_t *)malloc(size * 4);
+    ram = (uint32_t *)malloc(size * sizeof(uint32_t));
     if (ram == NULL)
     {
         printf("[VISC] \x1B[31mERROR\x1B[0m Failed to allocate memory for RAM!\n");
