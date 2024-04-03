@@ -125,7 +125,7 @@ VISC_I *init_visc()
     VISC_I *cpu = malloc(sizeof(VISC_I));
     if (cpu == NULL)
     {
-        printf("[VISC] Failed to allocate memory for VISC_I structure.\n");
+        printf("[VISC] \x1B[31mERROR\x1B[0m Failed to allocate memory for VISC_I structure.\n");
         return NULL;
     }
 
@@ -148,6 +148,34 @@ VISC_I *init_visc()
     enable_extension(cpu, BASIC_SHIT);
     disable_extension(cpu, MULTIPLY); // Disable as default
     return cpu;
+}
+
+void cpu_reset(VISC_I *cpu)
+{
+    if (cpu == NULL)
+    {
+        printf("[VISC] \x1B[31mERROR\x1B[0m NULL cpu pointer passed to reset function.\n");
+        return;
+    }
+
+    cpu->planeNum = 0;
+    switch_plane(cpu, cpu->planeNum);
+
+    for (uint32_t i = 0; i > PLANE_SIZE; i++)
+    {
+        cpu->low_plane[i] = 0x00000000;
+    }
+
+    for (uint32_t i = 0; i > PLANE_SIZE; i++)
+    {
+        cpu->high_plane[i] = 0x00000000;
+    }
+
+    cpu->high_plane[SP] = DEFAULT_STACK_START;
+    cpu->high_plane[BP] = DEFAULT_STACK_END;
+
+    enable_extension(cpu, BASIC_SHIT);
+    disable_extension(cpu, MULTIPLY);
 }
 
 char *get_reg_string(VISC_I *cpu, uint8_t n)
@@ -274,21 +302,7 @@ void run_visc(VISC_I *visc, uint32_t clock_speed)
     temp = visc;
 
     // Reset once again after the init to make sure all registers are ready
-    visc->planeNum = 0;
-    switch_plane(visc, visc->planeNum);
-
-    for (uint32_t i = 0; i > PLANE_SIZE; i++)
-    {
-        visc->low_plane[i] = 0x00000000;
-    }
-
-    for (uint32_t i = 0; i > PLANE_SIZE; i++)
-    {
-        visc->high_plane[i] = 0x00000000;
-    }
-
-    visc->high_plane[SP] = DEFAULT_STACK_START;
-    visc->high_plane[BP] = DEFAULT_STACK_END;
+    cpu_reset(visc);
 
     uint32_t addr;
     uint32_t data;
@@ -298,7 +312,6 @@ void run_visc(VISC_I *visc, uint32_t clock_speed)
     while (shouldRun)
     {
         addr = visc->high_plane[PC];
-        printf("0x%08X\n", addr);
 
         // Avoid going out of bounds
         // TODO: Fix issue where if you go past a certain point (0x0003EA6) it segfaults.
@@ -312,9 +325,7 @@ void run_visc(VISC_I *visc, uint32_t clock_speed)
         }
 
         val_low = bus_read(addr);
-        printf("L: 0x%08X\n", val_low);
         val_high = bus_read(addr + 1);
-        printf("H: 0x%08X\n", val_high);
         // printf("0x%08X: 0x%08X%08X\n", addr, val_low, val_high);
 
         Instruction instr = extract_instruction(val_low, val_high);

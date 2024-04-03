@@ -136,6 +136,7 @@ extern bool debug_step;
 extern uint32_t rom_size;
 
 VISC_I *init_visc();
+void cpu_reset(VISC_I *cpu);
 void run_visc(VISC_I *visc, uint32_t clock_speed);
 void switch_plane(VISC_I *cpu, uint32_t num);
 void enable_extension(VISC_I *cpu, uint32_t i);

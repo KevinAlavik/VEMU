@@ -28,19 +28,7 @@ void syscon_write(uint32_t addr, uint32_t data)
     case SYSCON_RESET:
         if (debug_log)
             printf("[VISC - Syscon] Triggered RESET!\n");
-        cpu->planeNum = 0;
-        switch_plane(cpu, cpu->planeNum);
-
-        for (uint32_t i = 0; i > PLANE_SIZE; i++)
-        {
-            cpu->low_plane[i] = 0x00000000;
-        }
-
-        for (uint32_t i = 0; i > PLANE_SIZE; i++)
-        {
-            cpu->high_plane[i] = 0x00000000;
-        }
-        cpu->high_plane[SP] = 0x00000100;
+        cpu_reset(cpu);
         break;
     case SYSCON_DUMP:
         if (!uartEnabled)
