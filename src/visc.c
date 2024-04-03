@@ -314,7 +314,6 @@ void run_visc(VISC_I *visc, uint32_t clock_speed)
         addr = visc->high_plane[PC];
 
         // Avoid going out of bounds
-        // TODO: Fix issue where if you go past a certain point (0x0003EA6) it segfaults.
         if ((addr + 1) >= (RAM_START + RAM_END))
         {
             if (debug_log)
