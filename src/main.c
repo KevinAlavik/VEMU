@@ -152,6 +152,7 @@ void usage(char *s)
     printf("  -dr,  --dump-rom                                      dumps the memory region with the ROM\n");
     printf("  -dd,  --dump-disk                                     dumps the memory region where the disk is located\n");
     printf("  -dm,  --dump-memory                                   dumps the entire memory\n");
+    printf("  -dra, --dump-range        [start - end]               dumps the memory in a range\n");
 }
 
 // Emulator entry
@@ -172,6 +173,10 @@ int main(int argc, char *argv[])
     bool info = false;
     char *disk_img = NULL;
     char *rom_img = NULL;
+
+    bool dump_range = false;
+    uint32_t dump_start = 0;
+    uint32_t dump_end = 0;
 
     cpu = init_visc();
 
@@ -376,6 +381,42 @@ int main(int argc, char *argv[])
                 printf("[VISC] \x1B[31mERROR\x1B[0m %s expected a argument. Usage %s %s [ROM image (path)]\n", argv[i], argv[0], argv[i]);
             }
         }
+        else if (strcmp(argv[i], "--dra") == 0 || strcmp(argv[i], "--dump-range") == 0)
+        {
+            dump_range = true;
+            if (i + 1 < argc)
+            {
+                char *range_str = argv[i + 1];
+                char *dash_pos = strchr(range_str, '-');
+                if (dash_pos != NULL)
+                {
+                    *dash_pos = '\0';
+                    char *endptr;
+                    dump_start = (uint32_t)strtol(range_str, &endptr, 0);
+                    if (*endptr != '\0')
+                    {
+                        printf("[VISC] \x1B[31mERROR\x1B[0m Invalid range start format. Use hexadecimal or decimal.\n");
+                        return EXIT_FAILURE;
+                    }
+                    dump_end = (uint32_t)strtol(dash_pos + 1, &endptr, 0);
+                    if (*endptr != '\0')
+                    {
+                        printf("[VISC] \x1B[31mERROR\x1B[0m Invalid range end format. Use hexadecimal or decimal.\n");
+                        return EXIT_FAILURE;
+                    }
+                }
+                else
+                {
+                    printf("[VISC] \x1B[31mERROR\x1B[0m Invalid range format. Use 'start-end' format.\n");
+                    return EXIT_FAILURE;
+                }
+            }
+            else
+            {
+                printf("[VISC] \x1B[31mERROR\x1B[0m Missing argument for '--dump-range'\n");
+                return EXIT_FAILURE;
+            }
+        }
         else
         {
             if (argv[i][0] == '-' || (argv[i][0] == '-' && argv[i][1] == '-'))
@@ -517,6 +558,11 @@ int main(int argc, char *argv[])
     if (dumpr)
     {
         hexdump(0x00000000, 0xFFFFFFFF);
+    }
+
+    if (dump_range)
+    {
+        hexdump(dump_start, dump_end - dump_start);
     }
 
     fclose(rom_raw);
