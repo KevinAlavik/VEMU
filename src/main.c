@@ -132,11 +132,8 @@ void usage(char *s)
     printf("  -h,   --help                                          display this help and exit\n");
     printf("  -v,   --version                                       output version information and exit\n");
     printf("  -i,   --info                                          outputs the info box\n");
-    printf("  -d,   --dump                                          dumps the register on shutdown\n");
     printf("  -l,   --debug                                         enable debug logging in the emulator\n");
     printf("  -s,   --step                                          enable step mode\n");
-    printf("  -r,   --dump-rom                                      dumps the memory region with the ROM\n");
-    printf("  -dd,  --dump-disk                                     dumps the memory region where the disk is located\n");
     printf("  -ld,  --devices                                       lists all available devices\n");
     printf("  -mm,  --memory-map                                    outputs the memory map in a easy to read format\n");
     printf("  -le,  --list-extensions                               outputs all available extensions \n");
@@ -148,7 +145,13 @@ void usage(char *s)
     printf("  -rs,  --rom-size          [size]                      sets the ROM size (0xFF by default)\n");
     printf("  -c,   --clock-speed       [speed]                     sets the clock speed (10 by default. 0 for as fast as possible)\n");
     printf("  -di,  --disk-image        [path]                      the disk image that the storage drive will load\n");
+    printf("  -r,   --rom-image         [path]                      the initial ROM image\n");
     printf("  -ds,  --dump-stack                                    dumps the stack (from SP to BP)\n");
+    printf("  -d,   --dump                                          dumps the register on shutdown\n");
+    printf("  -ds,  --dump-stack                                    dumps the stack (from SP to BP)\n");
+    printf("  -dr,  --dump-rom                                      dumps the memory region with the ROM\n");
+    printf("  -dd,  --dump-disk                                     dumps the memory region where the disk is located\n");
+    printf("  -dm,  --dump-memory                                   dumps the entire memory\n");
 }
 
 // Emulator entry
@@ -160,14 +163,15 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    char *filename = NULL;
     bool dumpm = false;
+    bool dumpr = false;
     bool dumpd = false;
     bool stack_dump = false;
     bool ld = false;
     bool le = false;
     bool info = false;
     char *disk_img = NULL;
+    char *rom_img = NULL;
 
     cpu = init_visc();
 
@@ -199,7 +203,7 @@ int main(int argc, char *argv[])
         {
             debug_step = true;
         }
-        else if (strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--dump-rom") == 0)
+        else if (strcmp(argv[i], "-dr") == 0 || strcmp(argv[i], "--dump-rom") == 0)
         {
             dumpm = true;
         }
@@ -356,6 +360,22 @@ int main(int argc, char *argv[])
         {
             stack_dump = true;
         }
+        else if (strcmp(argv[i], "-dm") == 0 || strcmp(argv[i], "--dump-memory") == 0)
+        {
+            dumpr = true;
+        }
+        else if (strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--rom-image") == 0)
+        {
+            if (i + 1 < argc)
+            {
+                rom_img = argv[i + 1];
+            }
+            else
+            {
+
+                printf("[VISC] \x1B[31mERROR\x1B[0m %s expected a argument. Usage %s %s [ROM image (path)]\n", argv[i], argv[0], argv[i]);
+            }
+        }
         else
         {
             if (argv[i][0] == '-' || (argv[i][0] == '-' && argv[i][1] == '-'))
@@ -363,23 +383,22 @@ int main(int argc, char *argv[])
                 printf("[VISC] \x1B[31mERROR\x1B[0m Invalid option \"%s\"\n", argv[i]);
                 return EXIT_FAILURE;
             }
-            else
-            {
-                filename = argv[i];
-            }
         }
     }
 
-    if (filename == NULL)
+    FILE *rom_raw = NULL;
+    if (rom_img != NULL)
     {
-        printf("[VISC] \x1B[31mERROR\x1B[0m No input file specified\n");
-        return EXIT_FAILURE;
+        rom_raw = fopen(rom_img, "rb");
+        if (rom_raw == NULL)
+        {
+            perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM image");
+            return EXIT_FAILURE;
+        }
     }
-
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL)
+    else
     {
-        perror("[VISC] \x1B[31mERROR\x1B[0m Error opening ROM file");
+        perror("[VISC] \x1B[31mERROR\x1B[0m No ROM image specified. Specify one using \"-r, --rom-image\"\n");
         return EXIT_FAILURE;
     }
 
@@ -396,7 +415,7 @@ int main(int argc, char *argv[])
     }
 
     // Setup the ROM
-    rom_init(ROM_START, rom_size, file);
+    rom_init(ROM_START, rom_size, rom_raw);
 
     // Setup the storage device
     if (disk_raw == NULL)
@@ -443,13 +462,18 @@ int main(int argc, char *argv[])
     }
 
     if (ld)
+    {
         list_devices();
+        return 0;
+    }
 
     if (le)
+    {
         list_extensions();
+        return 0;
+    }
 
-    // Hacky trick to clear stack
-    for (int i = DEFAULT_STACK_START; i < DEFAULT_STACK_END; i++)
+    for (int i = cpu->high_plane[SP]; i < cpu->high_plane[BP]; i++)
     {
         bus_write(i, 0);
     }
@@ -471,13 +495,7 @@ int main(int argc, char *argv[])
 
     if (dumpm)
     {
-        busEnable = true;
-        for (uint32_t i = ROM_START; i < ROM_END; i++)
-        {
-            uint32_t v = bus_read(i);
-            printf("0x%08X: 0x%08X\n", i, v);
-        }
-        busEnable = false;
+        hexdump(ROM_START, ROM_END - ROM_START);
     }
     if (dumpd)
     {
@@ -496,7 +514,13 @@ int main(int argc, char *argv[])
         hexdump(cpu->high_plane[SP], cpu->high_plane[BP] - cpu->high_plane[SP]);
     }
 
-    fclose(file);
+    if (dumpr)
+    {
+        hexdump(0x00000000, 0xFFFFFFFF);
+    }
+
+    fclose(rom_raw);
+    fclose(disk_raw);
 
     return 0;
 }
