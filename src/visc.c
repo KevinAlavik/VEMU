@@ -4,7 +4,7 @@ VISC_I *temp;
 bool shouldRun = true;
 bool debug_log = false;
 bool debug_step = false;
-int rom_size = ROM_END;
+uint32_t rom_size = ROM_END;
 
 struct Instruction
 {
@@ -15,7 +15,7 @@ struct Instruction
     uint32_t argument;
 };
 
-void switch_plane(VISC_I *cpu, int num)
+void switch_plane(VISC_I *cpu, uint32_t num)
 {
     if (cpu != NULL)
     {
@@ -47,7 +47,7 @@ void switch_plane(VISC_I *cpu, int num)
     }
 }
 
-char get_extension_letter(int i)
+char get_extension_letter(uint32_t i)
 {
     switch (i)
     {
@@ -60,7 +60,7 @@ char get_extension_letter(int i)
     }
 }
 
-int get_extension_id(char *s)
+uint32_t get_extension_id(char *s)
 {
     if (strcmp(s, "BASIC_SHIT") == 0)
     {
@@ -76,7 +76,7 @@ int get_extension_id(char *s)
     }
 }
 
-char *get_extension_string(int i)
+char *get_extension_string(uint32_t i)
 {
     switch (i)
     {
@@ -89,7 +89,7 @@ char *get_extension_string(int i)
     }
 }
 
-void enable_extension(VISC_I *cpu, int i)
+void enable_extension(VISC_I *cpu, uint32_t i)
 {
     if (cpu != NULL)
     {
@@ -99,7 +99,7 @@ void enable_extension(VISC_I *cpu, int i)
     }
 }
 
-void disable_extension(VISC_I *cpu, int i)
+void disable_extension(VISC_I *cpu, uint32_t i)
 {
     if (cpu != NULL)
     {
@@ -112,7 +112,7 @@ void disable_extension(VISC_I *cpu, int i)
     }
 }
 
-bool extension_enabled(VISC_I *cpu, int i)
+bool extension_enabled(VISC_I *cpu, uint32_t i)
 {
     if (cpu->extensions[i] == UINT8_MAX)
         return true;
@@ -132,12 +132,12 @@ VISC_I *init_visc()
     cpu->planeNum = 0;
     switch_plane(cpu, cpu->planeNum);
 
-    for (int i = 0; i > PLANE_SIZE; i++)
+    for (uint32_t i = 0; i > PLANE_SIZE; i++)
     {
         cpu->low_plane[i] = 0x00000000;
     }
 
-    for (int i = 0; i > PLANE_SIZE; i++)
+    for (uint32_t i = 0; i > PLANE_SIZE; i++)
     {
         cpu->high_plane[i] = 0x00000000;
     }
@@ -260,15 +260,15 @@ Instruction extract_instruction(uint32_t val_low, uint32_t val_high)
 }
 
 // Emulate a delay in Mhz
-void delay_mhz(unsigned int frequency_mhz)
+void delay_mhz(uint32_t frequency_mhz)
 {
     if (frequency_mhz <= 0)
         return;
-    unsigned int delay_microseconds = 1000000 / (frequency_mhz * 10);
+    uint32_t delay_microseconds = 1000000 / (frequency_mhz * 10);
     usleep(delay_microseconds);
 }
 
-void run_visc(VISC_I *visc, int clock_speed)
+void run_visc(VISC_I *visc, uint32_t clock_speed)
 {
     shouldRun = true;
     temp = visc;
@@ -277,12 +277,12 @@ void run_visc(VISC_I *visc, int clock_speed)
     visc->planeNum = 0;
     switch_plane(visc, visc->planeNum);
 
-    for (int i = 0; i > PLANE_SIZE; i++)
+    for (uint32_t i = 0; i > PLANE_SIZE; i++)
     {
         visc->low_plane[i] = 0x00000000;
     }
 
-    for (int i = 0; i > PLANE_SIZE; i++)
+    for (uint32_t i = 0; i > PLANE_SIZE; i++)
     {
         visc->high_plane[i] = 0x00000000;
     }
@@ -290,12 +290,15 @@ void run_visc(VISC_I *visc, int clock_speed)
     visc->high_plane[SP] = DEFAULT_STACK_START;
     visc->high_plane[BP] = DEFAULT_STACK_END;
 
+    uint32_t addr;
+    uint32_t data;
+    uint32_t val_low;
+    uint32_t val_high;
+
     while (shouldRun)
     {
-        int addr;
-        uint32_t data;
-
         addr = visc->high_plane[PC];
+        printf("0x%08X\n", addr);
 
         // Avoid going out of bounds
         // TODO: Fix issue where if you go past a certain point (0x0003EA6) it segfaults.
@@ -308,8 +311,10 @@ void run_visc(VISC_I *visc, int clock_speed)
             return;
         }
 
-        uint32_t val_low = bus_read(addr);
-        uint32_t val_high = bus_read(addr + 1);
+        val_low = bus_read(addr);
+        printf("L: 0x%08X\n", val_low);
+        val_high = bus_read(addr + 1);
+        printf("H: 0x%08X\n", val_high);
         // printf("0x%08X: 0x%08X%08X\n", addr, val_low, val_high);
 
         Instruction instr = extract_instruction(val_low, val_high);

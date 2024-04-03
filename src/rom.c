@@ -10,8 +10,8 @@ uint32_t rom_read(uint32_t addr)
     {
         return 0;
     }
-    // if (debug_log)
-    //     printf("[VISC Debug] 0x%08X -> 0x%08X\n", addr, rom[addr - rom_base]);
+    if (debug_log)
+        printf("[VISC Debug] 0x%08X -> 0x%08X\n", addr, rom[addr - rom_base]);
 
     return rom[addr - rom_base];
 }

@@ -1,6 +1,7 @@
 CC ?= gcc
 CFLAGS := -Wall -Wno-newline-eof -pedantic -Werror -Wshadow -Wstrict-aliasing -Wstrict-overflow -O3
 LDFLAGS := 
+SANITIZE_FLAGS := 
 
 BIN_DIR := bin
 OBJ_DIR := build
@@ -19,25 +20,21 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	@mkdir -p $(@D)
 	@printf "  LD $(notdir $@)\n"
-	@$(CC) $(LDFLAGS) $(OBJ) -o $@
+	@$(CC) $(SANITIZE_FLAGS) $(LDFLAGS) $(OBJ) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/devices/%.c
 	@mkdir -p $(@D)
 	@printf "  CC $<\n"
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(SANITIZE_FLAGS) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(@D)
 	@printf "  CC $<\n"
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(SANITIZE_FLAGS) $(CFLAGS) -c $< -o $@
 	
 .PHONY: debug
-debug: CFLAGS += -DDEBUG_LOG -DDUMP_REGS
+debug: SANITIZE_FLAGS += -fsanitize=address -fno-omit-frame-pointer
 debug: all
-
-.PHONY: dump
-dump: CFLAGS += -DDUMP_REGS
-dump: all
 
 .PHONY: install
 install: $(TARGET)

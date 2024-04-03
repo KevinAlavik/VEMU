@@ -2,7 +2,7 @@
 #include <string.h>
 
 #define VERSION_STR "v0.1.4"
-int clock_speed = 10;
+uint32_t clock_speed = 10;
 
 VISC_I *cpu;
 bool runEmu = true;
@@ -75,7 +75,7 @@ void hexdump(uint32_t start, uint32_t size)
     for (uint32_t i = 0; i < size; i += 16)
     {
         printf("%08X: ", start + i);
-        for (int j = 0; j < 4; j++)
+        for (uint32_t j = 0; j < 4; j++)
         {
             if (i + j * 4 < size)
             {
@@ -91,7 +91,7 @@ void hexdump(uint32_t start, uint32_t size)
             }
         }
         printf(" ");
-        for (int j = 0; j < 16; j++)
+        for (uint32_t j = 0; j < 16; j++)
         {
             if (i + j < size)
             {
@@ -184,7 +184,7 @@ int main(int argc, char *argv[])
     syscon_init(SYSCON_START);
     uart_init(UART_START);
 
-    for (int i = 1; i < argc; i++)
+    for (uint32_t i = 1; i < argc; i++)
     {
         if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0)
         {
@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
                 {
                     if (i + 2 < argc)
                     {
-                        int id;
+                        uint32_t id;
                         if (isnum(argv[i + 2]))
                             id = atoi(argv[i + 2]);
                         else
@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
                     if (i + 2 < argc)
                     {
                         printf("[VISC] \x1B[0;33mWARNING!\x1B[0m Disabling some of the CPU extensions may cause unexpected/broken behaviour!\n");
-                        int id;
+                        uint32_t id;
                         if (isnum(argv[i + 2]))
                             id = atoi(argv[i + 2]);
                         else
@@ -514,7 +514,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    for (int i = cpu->high_plane[SP]; i < cpu->high_plane[BP]; i++)
+    for (uint32_t i = DEFAULT_STACK_START; i < DEFAULT_STACK_END; i++)
     {
         bus_write(i, 0);
     }
@@ -543,7 +543,7 @@ int main(int argc, char *argv[])
         if (!storageEnabled)
             return 0;
 
-        for (int i = 0; i < MAX_SECTORS; i++)
+        for (uint32_t i = 0; i < MAX_SECTORS; i++)
         {
             printf("Sector %d:\n", i + 1);
             hexdump((DEFAULT_STACK_END + 1) + (0x200 * i), 0x200);

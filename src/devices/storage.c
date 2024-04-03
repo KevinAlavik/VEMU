@@ -39,6 +39,8 @@ void storage_write(uint32_t addr, uint32_t data)
         sector_num = cpu->low_plane[A1];
         sector_count = cpu->low_plane[A2];
         o = cpu->low_plane[A3];
+        if (debug_log)
+            printf("[VISC] Reading %d sectors (starting from %d) into 0x%08X!\n", sector_count, sector_count, o);
 
         uint32_t start = STORAGE_START + (0x200 * sector_num);
         uint32_t end = start + (0x200 * sector_count);
@@ -48,6 +50,8 @@ void storage_write(uint32_t addr, uint32_t data)
             bus_write(o, (uint32_t)storage[addr1 - storage_base]);
             o++;
         }
+        if (debug_log)
+            printf("[VISC] Successfully read %d sectors (starting from %d)!\n", sector_count, sector_count);
         break;
     case STORAGE_WRITE:
         sector_num = cpu->low_plane[A1];

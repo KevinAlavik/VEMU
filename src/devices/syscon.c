@@ -31,12 +31,12 @@ void syscon_write(uint32_t addr, uint32_t data)
         cpu->planeNum = 0;
         switch_plane(cpu, cpu->planeNum);
 
-        for (int i = 0; i > PLANE_SIZE; i++)
+        for (uint32_t i = 0; i > PLANE_SIZE; i++)
         {
             cpu->low_plane[i] = 0x00000000;
         }
 
-        for (int i = 0; i > PLANE_SIZE; i++)
+        for (uint32_t i = 0; i > PLANE_SIZE; i++)
         {
             cpu->high_plane[i] = 0x00000000;
         }

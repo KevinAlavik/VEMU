@@ -7,7 +7,7 @@
 bool busEnable = true;
 
 static struct device devices[MAX_DEVICES];
-static int num_devices = 0;
+static uint32_t num_devices = 0;
 
 void disable_buss()
 {
@@ -27,7 +27,7 @@ bool add_device(uint32_t base, uint32_t limit, BusReadFunc read,
     }
 
     // Check for overlap with existing devices
-    for (int i = 0; i < num_devices; i++)
+    for (uint32_t i = 0; i < num_devices; i++)
     {
         if ((base >= devices[i].base && base <= devices[i].limit) ||
             (limit >= devices[i].base && limit <= devices[i].limit))
@@ -43,7 +43,7 @@ bool add_device(uint32_t base, uint32_t limit, BusReadFunc read,
     devices[num_devices].write = write;
 
     if (debug_log)
-        printf("[VISC Debug] Added device with base: %u, limit: %u to the bus\n", base, limit);
+        printf("[VISC Debug] Added device with base: 0x%08X, limit: 0x%08X to the bus\n", base, limit);
 
     num_devices++;
     return true;
@@ -71,7 +71,7 @@ void bus_write(uint32_t addr, uint32_t data)
 uint32_t bus_read(uint32_t addr)
 {
     if (!busEnable)
-        return -1;
+        return 0;
 
     for (uint32_t i = 0; i < num_devices; i++)
     {
