@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
 
         cpu->low_plane[A1] = 0;
         cpu->low_plane[A2] = MAX_SECTORS;
-        cpu->low_plane[A3] = DEFAULT_STACK_END + 1;
+        cpu->low_plane[A3] = DEFAULT_STACK_END + 1; // Write the boot disk into 0x00001000
         bus_write(STORAGE_START, STORAGE_READ);
     }
 
